@@ -1,0 +1,61 @@
+h1 {
+    text-align: center; 
+    margin: 10px;
+}
+
+body{
+    margin: 60px;
+    margin-top: 50px;
+    overflow: hidden;
+}
+
+.hp-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 0 20px;
+}
+
+.box-container{
+    display: flex;
+    gap: 50px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.player-hp-section, .boss-hp-section {
+    text-align: center;
+    width: 250px;
+}
+
+.player-hp-wrapper, .boss-hp-wrapper{
+    height:30px;
+    width: 250px;
+    border: 3px solid black;
+    background-color: #eee;
+    margin-top: 5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hp-bar-fill {
+    height: 100%;
+    width: 100%;
+    background-color: #4CAF50;
+    transition: width 0.3s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.boss-box{
+    height: 700px;
+    width: 600px;
+    border: 3px solid black;
+}
+
+.player-box{
+    height: 700px;
+    width: 600px;
+    border: 3px solid black;
+}
+
