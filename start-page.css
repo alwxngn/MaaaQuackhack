@@ -1,0 +1,17 @@
+body{
+background-image: url('assets/comboCraft-start.jpg');  
+background-size: 100%;  
+text-align: center; 
+}
+
+h1{
+    color: white;
+    padding-top: 200px;
+    font-size: 100px;
+}
+
+button{
+    height: 100px;
+    width: 400px;
+    font-size: 40px;
+}
