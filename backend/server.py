@@ -74,7 +74,18 @@ def add_mana():
     global current_mana
     data = request.json
     mana_amount = data.get('amount', 30)  # Increased from 20 to 30
-    current_mana = min(MAX_MANA, current_mana + mana_amount)
+    # Don't allow negative mana to go below 0, but allow resetting from tutorial
+    if mana_amount < 0 and current_mana >= 999:
+        current_mana = MAX_MANA  # Reset to max from tutorial mode
+    else:
+        current_mana = min(MAX_MANA, max(0, current_mana + mana_amount))
+    return jsonify({'status': 'ok', 'mana': current_mana})
+
+@app.route('/set_tutorial_mode', methods=['POST'])
+def set_tutorial_mode():
+    """Set tutorial mode (unlimited mana)"""
+    global current_mana
+    current_mana = 999  # 999 = unlimited mana flag
     return jsonify({'status': 'ok', 'mana': current_mana})
 
 @app.route('/get_command')
@@ -84,27 +95,48 @@ def get_command():
     """
     global browser_gesture, current_mana, last_mana_regen_time
     
-    # Regenerate mana over time
-    current_time = time.time()
-    time_since_regen = current_time - last_mana_regen_time
-    if time_since_regen >= 0.1:  # Update every 100ms
-        mana_regen = MANA_REGEN_RATE * time_since_regen
-        current_mana = min(MAX_MANA, current_mana + mana_regen)
-        last_mana_regen_time = current_time
+    # Check if tutorial mode (mana = 999 means unlimited)
+    is_tutorial = current_mana >= 999
+    
+    # Regenerate mana over time (skip in tutorial mode)
+    if not is_tutorial:
+        current_time = time.time()
+        time_since_regen = current_time - last_mana_regen_time
+        if time_since_regen >= 0.1:  # Update every 100ms
+            mana_regen = MANA_REGEN_RATE * time_since_regen
+            current_mana = min(MAX_MANA, current_mana + mana_regen)
+            last_mana_regen_time = current_time
     
     # 1. Get the gesture from browser MediaPipe detection
     current_gesture = browser_gesture
     
-    # DEBUG: Log what gesture we got
-    if current_gesture != "NONE":
-        print(f"🖐️  DETECTED: {current_gesture}")
-
     # --- 3. Still SPELL LOGIC GOES HERE ---
     
     # --- FIX 2: Matched your spell names to Alan's gestures ---
     global last_gesture, combo_counter, last_attack_time
     global current_event, event_start_time, last_event_end_time
     global challenge_progress, challenge_target, challenge_gesture  
+    
+    # Check for THUMBS_UP (tutorial completion) - after global declaration
+    if current_gesture == "THUMBS_UP":
+        command = "THUMBS_UP"
+        last_gesture = current_gesture
+        return jsonify({
+            "command": command,
+            "event": "NONE",
+            "combo": combo_counter,
+            "gesture": current_gesture,
+            "cooldown": 0,
+            "mana": current_mana,
+            "max_mana": MAX_MANA,
+            "challenge_progress": 0,
+            "challenge_target": 0
+        })
+    
+    # DEBUG: Log what gesture we got
+    if current_gesture != "NONE":
+        print(f"🖐️  DETECTED: {current_gesture}")
+    
     command = "NONE"
     # combos!!
 
@@ -145,11 +177,14 @@ def get_command():
                 command = "LIGHTNING"
                 combo_counter += 1
 
-            # Check if player has enough mana
+            # Check if player has enough mana (or unlimited mana for tutorial)
             if command != "NONE":
                 mana_cost = MANA_COSTS.get(command, 0)
-                if current_mana >= mana_cost:
-                    current_mana -= mana_cost
+                # Tutorial mode: if mana is 999, it's unlimited
+                is_tutorial_mode = current_mana >= 999
+                if is_tutorial_mode or current_mana >= mana_cost:
+                    if not is_tutorial_mode:
+                        current_mana -= mana_cost
                     last_attack_time = current_time
                     print(f"⚡ COMMAND SENT: {command} (Mana: {current_mana}/{MAX_MANA})")
                 else:

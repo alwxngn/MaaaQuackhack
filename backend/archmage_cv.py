@@ -28,6 +28,20 @@ class _GestureRecognizer: # Changed to _ to show it's "private"
         ring_curled = landmarks[self.mp_hands.HandLandmark.RING_FINGER_TIP].y > landmarks[self.mp_hands.HandLandmark.RING_FINGER_MCP].y
         pinky_curled = landmarks[self.mp_hands.HandLandmark.PINKY_TIP].y > landmarks[self.mp_hands.HandLandmark.PINKY_MCP].y
         
+        # Check for thumbs up (thumb extended upward, other fingers curled)
+        thumb_tip = landmarks[self.mp_hands.HandLandmark.THUMB_TIP]
+        thumb_mcp = landmarks[self.mp_hands.HandLandmark.THUMB_MCP]
+        # Thumb is extended upward if tip is above MCP (thumb is pointing up)
+        thumb_extended_up = thumb_tip.y < thumb_mcp.y
+        
+        # Thumb is also extended outward (to the side)
+        thumb_ip = landmarks[self.mp_hands.HandLandmark.THUMB_IP]
+        thumb_extended_out = abs(thumb_tip.x - thumb_ip.x) > 0.05  # Thumb is extended to the side
+        
+        # Thumbs up: thumb extended (up or out) AND all other fingers curled
+        if (thumb_extended_up or thumb_extended_out) and index_curled and middle_curled and ring_curled and pinky_curled:
+            return "THUMBS_UP"
+        
         if index_curled and middle_curled and ring_curled and pinky_curled:
             return "FIST"
         if not index_curled and not middle_curled and not ring_curled and not pinky_curled:
