@@ -6,6 +6,22 @@ const MAX_BOSS_HEALTH = 300;
 let gameRunning = false;
 let comboCount = 0;
 
+// Sound effects system
+const sounds = {
+    fireball: new Audio('../assets/sounds/fireball.mp3'),
+    iceShard: new Audio('../assets/sounds/ice_shard.wav'),
+    thunder: new Audio('../assets/sounds/thunder.wav'),
+    backgroundMusic: new Audio('../assets/sounds/background_music.wav')
+};
+
+// Initialize sounds with volume
+Object.values(sounds).forEach(sound => {
+    sound.volume = 0.5;
+});
+
+sounds.backgroundMusic.volume = 0.3;
+sounds.backgroundMusic.loop = true;
+
 // Mana system
 let currentMana = 100;
 let maxMana = 100;
@@ -23,13 +39,25 @@ let demonCleaveInterval = null; // Track cleave animation interval
 let lastBossAttackCheck = 0; // Track last boss attack check time
 const BOSS_ATTACK_CHECK_INTERVAL = 500; // Check every 500ms instead of every frame
 
+// Game start time tracking
+let gameStartTime = Date.now();
+
 // Wait for page to load
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Game loaded!");
     resetHealth();
+    gameStartTime = Date.now();
     startWebcam(); // <-- Start the webcam
     startDemonIdleAnimation(); // <-- Start demon idle animation
     gameRunning = true; // <-- START THE GAME!
+    
+    // Start background music
+    if (sounds.backgroundMusic) {
+        sounds.backgroundMusic.play().catch(err => {
+            console.log("Background music autoplay blocked:", err);
+        });
+    }
+    
     gameLoop();         // <-- START THE LOOP!
 });
 
@@ -80,6 +108,10 @@ async function sendGestureToBackend(gesture) {
     // Only send if gesture changed to reduce network traffic
     if (gesture !== lastSentGesture) {
         lastSentGesture = gesture;
+        // Show visual feedback for gesture detection
+        if (gesture !== 'NONE') {
+            showGestureFeedback(gesture);
+        }
         try {
             await fetch('http://localhost:5001/set_gesture', {
                 method: 'POST',
@@ -336,14 +368,25 @@ function checkManaBallCollision(projectileX, projectileY, projectileSize) {
         
         if (distance < (projectileSize / 2 + 20)) {
             // Hit! Remove ball and add mana
+            const manaAmount = 20;
             ball.element.remove();
             manaBalls.splice(i, 1);
+            
+            // Show mana gain feedback
+            const boxContainer = document.querySelector('.box-container');
+            if (boxContainer) {
+                const ballRect = ball.element.getBoundingClientRect();
+                const containerRect = boxContainer.getBoundingClientRect();
+                const x = ballRect.left - containerRect.left + 20;
+                const y = ballRect.top - containerRect.top + 20;
+                showManaGainFeedback(manaAmount, x, y);
+            }
             
             // Add mana via backend
             fetch('http://localhost:5001/add_mana', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({amount: 20})
+                body: JSON.stringify({amount: manaAmount})
             }).catch(err => console.error('Error adding mana:', err));
             
             return true;
@@ -366,76 +409,462 @@ function resetHealth() {
 
 function checkGameEnd() {
     if (playerHealth <= 0) {
-        console.log('💀 Player defeated! Boss wins!');
+        console.log('Player defeated! Boss wins!');
         gameRunning = false;
+        showGameOverScreen(false); // false = defeat
     } else if (bossHealth <= 0) {
-        console.log('🏆 Boss defeated! Player wins!');
+        console.log('Boss defeated! Player wins!');
         gameRunning = false;
-        showGameOver();
+        showGameOverScreen(true); // true = victory
     }
 }
 
-function showGameOver() {
-    // Create game over overlay
+// Enhanced Game Over/Victory Screen
+function showGameOverScreen(isVictory) {
+    // Stop background music
+    if (sounds.backgroundMusic) {
+        sounds.backgroundMusic.pause();
+    }
+    
+    // Remove any existing overlay
+    const existingOverlay = document.getElementById('game-over-overlay');
+    if (existingOverlay) {
+        existingOverlay.remove();
+    }
+    
+    // Create game over overlay with fire effects for victory
     const overlay = document.createElement('div');
     overlay.id = 'game-over-overlay';
-    overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
+    
+    if (isVictory) {
+        // Fiery victory background
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(139, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.5s ease-in;
+            overflow: hidden;
+        `;
+        
+        // Create fire particles background
+        const fireContainer = document.createElement('div');
+        fireContainer.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        `;
+        
+        // Add animated fire effect
+        for (let i = 0; i < 30; i++) {
+            const flame = document.createElement('div');
+            const x = Math.random() * 100;
+            const delay = Math.random() * 2;
+            const duration = 2 + Math.random() * 2;
+            flame.style.cssText = `
+                position: absolute;
+                bottom: ${Math.random() * 20}%;
+                left: ${x}%;
+                width: ${20 + Math.random() * 30}px;
+                height: ${40 + Math.random() * 60}px;
+                background: linear-gradient(to top, 
+                    rgba(255, 100, 0, 0.8) 0%,
+                    rgba(255, 200, 0, 0.6) 50%,
+                    rgba(255, 255, 255, 0.3) 100%);
+                border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+                animation: flicker ${duration}s ${delay}s infinite ease-in-out;
+                filter: blur(2px);
+            `;
+            fireContainer.appendChild(flame);
+        }
+        overlay.appendChild(fireContainer);
+    } else {
+        // Dark defeat background
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.98);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.5s ease-in;
+        `;
+    }
+    
+    // Add animations and styles
+    const style = document.createElement('style');
+    style.id = 'victory-screen-styles';
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes flicker {
+            0%, 100% { 
+                transform: translateY(0) scaleY(1) scaleX(1);
+                opacity: 0.8;
+            }
+            25% { 
+                transform: translateY(-10px) scaleY(1.1) scaleX(0.95);
+                opacity: 1;
+            }
+            50% { 
+                transform: translateY(-20px) scaleY(0.9) scaleX(1.05);
+                opacity: 0.9;
+            }
+            75% { 
+                transform: translateY(-15px) scaleY(1.05) scaleX(0.98);
+                opacity: 1;
+            }
+        }
+        @keyframes burn {
+            0%, 100% {
+                text-shadow: 
+                    0 0 10px #FF4500,
+                    0 0 20px #FF4500,
+                    0 0 30px #FF6347,
+                    0 0 40px #FF4500,
+                    0 0 70px #FF4500;
+            }
+            50% {
+                text-shadow: 
+                    0 0 20px #FF6347,
+                    0 0 30px #FF6347,
+                    0 0 40px #FF4500,
+                    0 0 50px #FF4500,
+                    0 0 80px #FF6347,
+                    0 0 100px #FF4500;
+            }
+        }
+        @keyframes glow {
+            0%, 100% {
+                filter: drop-shadow(0 0 10px currentColor);
+            }
+            50% {
+                filter: drop-shadow(0 0 20px currentColor) drop-shadow(0 0 30px currentColor);
+            }
+        }
     `;
+    document.head.appendChild(style);
     
     const title = document.createElement('h1');
-    title.textContent = 'VICTORY!';
+    title.textContent = isVictory ? 'VICTORY' : 'DEFEAT';
     title.style.cssText = `
-        color: #FFD700;
-        font-size: 72px;
+        color: ${isVictory ? '#FF4500' : '#CC0000'};
+        font-size: 96px;
+        font-weight: 900;
         margin-bottom: 30px;
-        text-shadow: 0 0 20px #FFD700;
+        letter-spacing: 8px;
+        text-transform: uppercase;
+        animation: ${isVictory ? 'burn 2s ease-in-out infinite, slideUp 0.8s ease-out' : 'glow 2s ease-in-out infinite, slideUp 0.8s ease-out'};
+        font-family: 'Bungee', cursive;
+        position: relative;
+        z-index: 10;
+        text-shadow: ${isVictory ? `
+            0 0 10px #FF4500,
+            0 0 20px #FF4500,
+            0 0 30px #FF6347,
+            0 0 40px #FF4500,
+            0 0 70px #FF4500,
+            2px 2px 4px rgba(0,0,0,0.8)
+        ` : `
+            0 0 10px #CC0000,
+            0 0 20px #CC0000,
+            0 0 30px #990000,
+            2px 2px 4px rgba(0,0,0,0.8)
+        `};
+    `;
+    
+    // Add stats
+    const stats = document.createElement('div');
+    stats.style.cssText = `
+        color: ${isVictory ? '#FFD700' : '#FFFFFF'};
+        font-size: 28px;
+        margin-bottom: 40px;
+        text-align: center;
+        animation: slideUp 0.5s ease-out 0.3s both;
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 700;
+        position: relative;
+        z-index: 10;
+        text-shadow: ${isVictory ? `
+            0 0 10px rgba(255, 215, 0, 0.8),
+            0 0 20px rgba(255, 140, 0, 0.6),
+            2px 2px 4px rgba(0,0,0,0.8)
+        ` : `
+            2px 2px 4px rgba(0,0,0,0.8)
+        `};
+    `;
+    const gameTime = typeof gameStartTime !== 'undefined' ? Math.floor((Date.now() - gameStartTime) / 1000) : 0;
+    stats.innerHTML = `
+        <div style="margin-bottom: 15px;">Combos: ${comboCount}</div>
+        <div style="margin-bottom: 15px;">Time: ${gameTime}s</div>
+        <div>Final Boss HP: ${Math.max(0, bossHealth)}/${MAX_BOSS_HEALTH}</div>
     `;
     
     const replayButton = document.createElement('button');
-    replayButton.textContent = 'Play Again';
+    replayButton.textContent = 'PLAY AGAIN';
     replayButton.style.cssText = `
-        padding: 20px 40px;
-        font-size: 24px;
-        background: #4CAF50;
+        padding: 20px 50px;
+        font-size: 26px;
+        font-weight: 900;
+        background: ${isVictory ? 'linear-gradient(135deg, #FF4500, #FF6347)' : 'linear-gradient(135deg, #CC0000, #990000)'};
         color: white;
-        border: none;
-        border-radius: 10px;
+        border: 3px solid ${isVictory ? '#FFD700' : '#FFFFFF'};
+        border-radius: 15px;
         cursor: pointer;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        box-shadow: ${isVictory ? `
+            0 0 20px rgba(255, 69, 0, 0.6),
+            0 8px 16px rgba(0,0,0,0.4),
+            inset 0 0 20px rgba(255, 215, 0, 0.3)
+        ` : `
+            0 8px 16px rgba(0,0,0,0.4),
+            inset 0 0 20px rgba(255,255,255,0.1)
+        `};
+        transition: all 0.3s;
+        animation: slideUp 0.5s ease-out 0.5s both;
+        font-family: 'Bungee', cursive;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        position: relative;
+        z-index: 10;
     `;
-    replayButton.onclick = replayGame;
+    replayButton.onmouseover = function() {
+        if (isVictory) {
+            this.style.background = 'linear-gradient(135deg, #FF6347, #FF4500)';
+            this.style.boxShadow = `
+                0 0 30px rgba(255, 69, 0, 0.8),
+                0 10px 20px rgba(0,0,0,0.5),
+                inset 0 0 30px rgba(255, 215, 0, 0.4)
+            `;
+        } else {
+            this.style.background = 'linear-gradient(135deg, #990000, #CC0000)';
+            this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.5), inset 0 0 30px rgba(255,255,255,0.2)';
+        }
+        this.style.transform = 'scale(1.08) translateY(-2px)';
+    };
+    replayButton.onmouseout = function() {
+        if (isVictory) {
+            this.style.background = 'linear-gradient(135deg, #FF4500, #FF6347)';
+            this.style.boxShadow = `
+                0 0 20px rgba(255, 69, 0, 0.6),
+                0 8px 16px rgba(0,0,0,0.4),
+                inset 0 0 20px rgba(255, 215, 0, 0.3)
+            `;
+        } else {
+            this.style.background = 'linear-gradient(135deg, #CC0000, #990000)';
+            this.style.boxShadow = '0 8px 16px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.1)';
+        }
+        this.style.transform = 'scale(1) translateY(0)';
+    };
+    replayButton.onclick = function() {
+        overlay.remove();
+        replayGame();
+    };
     
     overlay.appendChild(title);
+    overlay.appendChild(stats);
     overlay.appendChild(replayButton);
     document.body.appendChild(overlay);
+}
+
+// Helper function to show combo messages
+function showComboMessage(text, color = 0xFFD700) {
+    const boxContainer = document.querySelector('.box-container');
+    if (!boxContainer) return;
+    
+    const message = document.createElement('div');
+    message.textContent = text;
+    message.style.position = 'absolute';
+    message.style.top = '20%';
+    message.style.left = '50%';
+    message.style.transform = 'translate(-50%, -50%)';
+    message.style.fontSize = '48px';
+    message.style.fontWeight = 'bold';
+    message.style.color = `#${color.toString(16).padStart(6, '0')}`;
+    message.style.textShadow = '0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,255,255,0.5)';
+    message.style.zIndex = '1000';
+    message.style.pointerEvents = 'none';
+    message.style.animation = 'comboPulse 0.5s ease-out';
+    
+    // Add animation
+    if (!document.getElementById('combo-animation-style')) {
+        const style = document.createElement('style');
+        style.id = 'combo-animation-style';
+        style.textContent = `
+            @keyframes comboPulse {
+                0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+                50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+                100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    boxContainer.appendChild(message);
+    
+    setTimeout(() => {
+        message.style.transition = 'all 0.5s ease-out';
+        message.style.opacity = '0';
+        message.style.transform = 'translate(-50%, -100%) scale(0.5)';
+        setTimeout(() => message.remove(), 500);
+    }, 2000);
+}
+
+// Helper function to show damage numbers
+function showDamageNumber(damage, x, y, color = '#FF4444', isHealing = false) {
+    const boxContainer = document.querySelector('.box-container');
+    if (!boxContainer) return;
+    
+    const damageText = document.createElement('div');
+    damageText.textContent = isHealing ? `+${damage}` : `-${damage}`;
+    damageText.style.position = 'absolute';
+    damageText.style.left = x + 'px';
+    damageText.style.top = y + 'px';
+    damageText.style.fontSize = '36px';
+    damageText.style.fontWeight = 'bold';
+    damageText.style.color = color;
+    damageText.style.textShadow = '2px 2px 4px rgba(0,0,0,0.8)';
+    damageText.style.zIndex = '1001';
+    damageText.style.pointerEvents = 'none';
+    damageText.style.userSelect = 'none';
+    
+    boxContainer.appendChild(damageText);
+    
+    // Animate damage number
+    let startY = y;
+    let opacity = 1;
+    let scale = 1;
+    const animate = () => {
+        startY -= 2;
+        opacity -= 0.02;
+        scale += 0.02;
+        damageText.style.top = startY + 'px';
+        damageText.style.opacity = opacity;
+        damageText.style.transform = `scale(${scale})`;
+        
+        if (opacity > 0) {
+            requestAnimationFrame(animate);
+        } else {
+            damageText.remove();
+        }
+    };
+    requestAnimationFrame(animate);
+}
+
+// Visual feedback for gesture detection
+let lastDetectedGesture = 'NONE';
+function showGestureFeedback(gesture) {
+    if (gesture === 'NONE' || gesture === lastDetectedGesture) return;
+    
+    lastDetectedGesture = gesture;
+    
+    const canvas = document.getElementById('output-canvas');
+    if (!canvas) return;
+    
+    // Flash effect on canvas
+    canvas.style.transition = 'filter 0.1s';
+    canvas.style.filter = 'brightness(1.3) saturate(1.5)';
+    
+    setTimeout(() => {
+        canvas.style.filter = 'brightness(1) saturate(1)';
+    }, 100);
+}
+
+// Show mana gain feedback
+function showManaGainFeedback(amount, x, y) {
+    const boxContainer = document.querySelector('.box-container');
+    if (!boxContainer) return;
+    
+    const manaText = document.createElement('div');
+    manaText.textContent = `+${amount} Mana`;
+    manaText.style.position = 'absolute';
+    manaText.style.left = x + 'px';
+    manaText.style.top = y + 'px';
+    manaText.style.fontSize = '28px';
+    manaText.style.fontWeight = 'bold';
+    manaText.style.color = '#4A9EFF';
+    manaText.style.textShadow = '0 0 10px #4A9EFF, 0 0 20px #4A9EFF, 2px 2px 4px rgba(0,0,0,0.8)';
+    manaText.style.zIndex = '1002';
+    manaText.style.pointerEvents = 'none';
+    manaText.style.userSelect = 'none';
+    manaText.style.fontFamily = '"Orbitron", sans-serif';
+    
+    boxContainer.appendChild(manaText);
+    
+    // Animate mana text
+    let startY = y;
+    let opacity = 1;
+    let scale = 0.8;
+    const animate = () => {
+        startY -= 3;
+        opacity -= 0.015;
+        scale += 0.02;
+        manaText.style.top = startY + 'px';
+        manaText.style.opacity = opacity;
+        manaText.style.transform = `scale(${scale})`;
+        
+        if (opacity > 0) {
+            requestAnimationFrame(animate);
+        } else {
+            manaText.remove();
+        }
+    };
+    requestAnimationFrame(animate);
 }
 
 function replayGame() {
     // Remove game over overlay
     const overlay = document.getElementById('game-over-overlay');
-    if (overlay) {
-        overlay.remove();
-    }
+    if (overlay) overlay.remove();
     
     // Reset game state
+    gameStartTime = Date.now();
     resetHealth();
+    comboCount = 0;
+    lastDetectedGesture = 'NONE';
     gameRunning = true;
+    
+    // Restart background music
+    if (sounds.backgroundMusic) {
+        sounds.backgroundMusic.currentTime = 0;
+        sounds.backgroundMusic.play().catch(err => {
+            console.log("Background music autoplay blocked:", err);
+        });
+    }
+    
+    gameLoop();
 }
 
 // --- ⭐️ MODIFIED THIS FUNCTION ⭐️ ---
 // Fireball animation (now accepts damage)
 function playFireballAnimation(damage = 10) { // Default damage is 10
+    // Play sound effect
+    if (sounds.fireball) {
+        const sound = sounds.fireball.cloneNode();
+        sound.volume = 0.6;
+        sound.play().catch(err => console.log("Sound play failed:", err));
+    }
     const playerBox = document.querySelector('.player-box');
     const bossBox = document.querySelector('.boss-box');
     const boxContainer = document.querySelector('.box-container');
@@ -506,6 +935,12 @@ function playFireballAnimation(damage = 10) { // Default damage is 10
 
 // Ice shard animation
 function playIceShardAnimation() {
+    // Play sound effect
+    if (sounds.iceShard) {
+        const sound = sounds.iceShard.cloneNode();
+        sound.volume = 0.6;
+        sound.play().catch(err => console.log("Sound play failed:", err));
+    }
     const boxContainer = document.querySelector('.box-container');
     
     const iceShardFrames = [
@@ -582,6 +1017,12 @@ function playIceShardAnimation() {
 
 // Lightning animation
 function playLightningAnimation() {
+    // Play sound effect
+    if (sounds.thunder) {
+        const sound = sounds.thunder.cloneNode();
+        sound.volume = 0.7;
+        sound.play().catch(err => console.log("Sound play failed:", err));
+    }
     const bossBox = document.querySelector('.boss-box');
     const demonSprite = document.getElementById('demon-sprite');
     
@@ -662,6 +1103,15 @@ function playDemonHitAnimation(damage = 0) {
         // Queue the damage to apply after cleave finishes
         setTimeout(() => {
             if (reducedDamage > 0) {
+                // Show damage number for reduced damage
+                const bossBox = document.querySelector('.boss-box');
+                if (bossBox) {
+                    const boxRect = bossBox.getBoundingClientRect();
+                    const containerRect = document.querySelector('.box-container').getBoundingClientRect();
+                    const x = boxRect.left - containerRect.left + boxRect.width / 2;
+                    const y = boxRect.top - containerRect.top + boxRect.height / 2;
+                    showDamageNumber(reducedDamage, x, y, '#FFAA00'); // Orange for reduced damage
+                }
                 updateBossHealth(bossHealth - reducedDamage);
             }
         }, 1200); // Wait for cleave to finish (15 frames * 80ms = 1200ms)
@@ -696,6 +1146,15 @@ function playDemonHitAnimation(damage = 0) {
             
             // Apply damage after hit animation completes
             if (damage > 0) {
+                // Show damage number
+                const bossBox = document.querySelector('.boss-box');
+                if (bossBox) {
+                    const boxRect = bossBox.getBoundingClientRect();
+                    const containerRect = document.querySelector('.box-container').getBoundingClientRect();
+                    const x = boxRect.left - containerRect.left + boxRect.width / 2;
+                    const y = boxRect.top - containerRect.top + boxRect.height / 2;
+                    showDamageNumber(damage, x, y, '#FF4444');
+                }
                 updateBossHealth(bossHealth - damage);
             }
         }
@@ -871,27 +1330,51 @@ async function gameLoop(){
         // Damage will be applied after animation completes
     }
 
-    // HEAL DISABLED - No gesture mapped
-    // else if (command === "HEAL") {
-    //     let hp = 12
-    //     updatePlayerHealth(playerHealth + hp);
-    // }
-
-    // COMBO DISABLED
-    // else if (command === "EXPLOSION_COMBO") {
-    //     // Play both fireball and ice shard for combo
-    //     playFireballAnimation();
-    //     playIceShardAnimation();
-    //     // Damage will be applied by animations
-    // }
-
-    // COMBO DISABLED
-    // else if (command === "HEALING_LIGHT_COMBO") {
-    //     let damage = 12
-    //     let hp = 5
-    //     updateBossHealth(bossHealth - damage);
-    //     updatePlayerHealth(playerHealth + hp);
-    // }
+    // --- COMBO SYSTEM ENABLED ---
+    else if (command === "EXPLOSION_COMBO") {
+        // Play both fireball and ice shard for combo with bonus damage
+        let damage = 25; // Massive combo damage
+        if (event === "WEAKFIRE") {
+            damage += 15; // Even more damage if boss is weak to fire
+        }
+        showComboMessage("EXPLOSION COMBO!", 0xFF4500);
+        playFireballAnimation(damage);
+        setTimeout(() => playIceShardAnimation(), 200);
+    }
+    else if (command === "HEALING_LIGHT_COMBO") {
+        let damage = 20;
+        let hp = 15; // Heal player
+        showComboMessage("HEALING LIGHT!", 0x00FF00);
+        playLightningAnimation();
+        // Show damage number for boss
+        const bossBox = document.querySelector('.boss-box');
+        if (bossBox) {
+            const boxRect = bossBox.getBoundingClientRect();
+            const containerRect = document.querySelector('.box-container').getBoundingClientRect();
+            const x = boxRect.left - containerRect.left + boxRect.width / 2;
+            const y = boxRect.top - containerRect.top + boxRect.height / 2;
+            showDamageNumber(damage, x, y, '#FF4444');
+        }
+        // Show heal number for player
+        const playerBox = document.querySelector('.player-box');
+        if (playerBox) {
+            const boxRect = playerBox.getBoundingClientRect();
+            const containerRect = document.querySelector('.box-container').getBoundingClientRect();
+            const x = boxRect.left - containerRect.left + boxRect.width / 2;
+            const y = boxRect.top - containerRect.top + boxRect.height / 2;
+            showDamageNumber(hp, x, y, '#00FF00', true); // Green for healing (true = isHealing)
+        }
+        updateBossHealth(bossHealth - damage);
+        updatePlayerHealth(playerHealth + hp);
+    }
+    else if (command === "LIGHTNING_STRIKE_COMBO") {
+        let damage = 35; // Very high damage
+        showComboMessage("LIGHTNING STRIKE!", 0xFFD700);
+        playLightningAnimation();
+        setTimeout(() => {
+            playDemonHitAnimation(damage);
+        }, 500);
+    }
 
     // Boss's random attack with delay to reduce lag
     const currentTime = Date.now();
