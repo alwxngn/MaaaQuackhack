@@ -124,7 +124,7 @@ if __name__ == '__main__':
     # We have to create a *separate* recognizer and cap for this test
     # so it doesn't interfere with the server's one.
     test_recognizer = _GestureRecognizer()
-    test_cap = cv2.VideoCapture(0) 
+    test_cap = cv2.VideoCapture(1) 
 
     while True:
         ret, frame = test_cap.read()
