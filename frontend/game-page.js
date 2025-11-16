@@ -136,9 +136,7 @@ function updateEventDisplay(event, progress = 0, target = 0) {
     const eventDisplay = document.getElementById('event-display');
     if (!eventDisplay) return; // Safety check
 
-    if (event === "PUNCH_CHALLENGE") {
-        eventDisplay.textContent = `Event: PUNCH! (${progress}/${target})`;
-    } else if (event === "EXPLOSION_CHALLENGE") {
+    if (event === "EXPLOSION_CHALLENGE") {
         eventDisplay.textContent = "Event: Perform the EXPLOSION COMBO!";
     } else if (event === "HEAL_LIGHT_CHALLENGE") {
         eventDisplay.textContent = "Event: Perform the HEALING LIGHT COMBO!";

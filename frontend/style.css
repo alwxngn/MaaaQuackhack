@@ -63,3 +63,18 @@ h1 {
     text-align: center;
     margin: 10px 0;
 }
+
+.event-message {
+    position: fixed; /* Keeps it in the middle regardless of scrolling */
+    top: 50%; /* Vertically center */
+    left: 50%; /* Horizontally center */
+    transform: translate(-50%, -50%); /* Adjust for the element's size */
+    font-size: 36px; /* Make the text larger */
+    font-weight: bold; /* Make the text bold */
+    color: white; /* Set the text color */
+    background-color: rgba(0, 0, 0, 0.7); /* Add a semi-transparent background */
+    padding: 20px 40px; /* Add padding around the text */
+    border-radius: 10px; /* Optional: round the corners */
+    text-align: center; /* Center the text inside the box */
+    z-index: 1000; /* Ensure it appears above other elements */
+}
