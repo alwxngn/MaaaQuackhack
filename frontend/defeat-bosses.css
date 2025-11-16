@@ -1,0 +1,239 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Unbounded", sans-serif;
+    min-height: 100vh;
+    background: radial-gradient(circle at center, rgba(139, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    color: #ffe4b5;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+}
+
+/* Lava background fire effect */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("../assets/lava_background.png");
+    background-size: cover;
+    background-position: center;
+    opacity: 0.6;
+    z-index: -2;
+    animation: lavaFlow 20s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* Animated fire particles overlay */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 10% 90%, rgba(255, 100, 0, 0.3) 0%, transparent 20%),
+        radial-gradient(circle at 30% 85%, rgba(255, 200, 0, 0.2) 0%, transparent 25%),
+        radial-gradient(circle at 70% 88%, rgba(255, 100, 0, 0.3) 0%, transparent 20%),
+        radial-gradient(circle at 90% 92%, rgba(255, 200, 0, 0.2) 0%, transparent 25%);
+    z-index: -1;
+    animation: fireFlicker 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes lavaFlow {
+    0%, 100% {
+        transform: translateX(0) scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translateX(-2%) scale(1.02);
+        opacity: 0.7;
+    }
+}
+
+@keyframes fireFlicker {
+    0%, 100% {
+        opacity: 0.6;
+        filter: brightness(1);
+    }
+    25% {
+        opacity: 0.8;
+        filter: brightness(1.2);
+    }
+    50% {
+        opacity: 0.7;
+        filter: brightness(0.9);
+    }
+    75% {
+        opacity: 0.9;
+        filter: brightness(1.1);
+    }
+}
+
+/* Menu Button */
+.menu-button-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+}
+
+.menu-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #ff6347, #ff4500);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 2px solid #ff6347;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(255, 99, 71, 0.5);
+    cursor: pointer;
+}
+
+.menu-button:hover {
+    background: linear-gradient(135deg, #ff4500, #ff6347);
+    box-shadow: 0 0 25px rgba(255, 99, 71, 0.8);
+    transform: scale(1.05);
+}
+
+.menu-button:active {
+    transform: scale(0.98);
+}
+
+/* Defeat Bosses Section */
+.defeat-bosses-section {
+    width: 100%;
+    padding: 80px 40px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    position: relative;
+    z-index: 10;
+}
+
+.bosses-title {
+    font-family: "Bungee", sans-serif;
+    font-size: 3.5rem;
+    color: #ff6b00;
+    text-shadow: 0 0 30px #ff6b00, 2px 2px 6px rgba(0, 0, 0, 0.8);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.bosses-subtitle {
+    font-family: "Orbitron", sans-serif;
+    font-size: 1.3rem;
+    color: #ffb700;
+    text-shadow: 0 0 15px rgba(255, 183, 0, 0.6);
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.bosses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 40px;
+    width: 100%;
+    max-width: 1200px;
+    justify-items: center;
+    padding: 20px;
+}
+
+.boss-card {
+    width: 240px;
+    height: 320px;
+    background: linear-gradient(135deg, #2a1a1a 0%, #1a0a0a 100%);
+    border: 3px solid #ff9500;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(255, 149, 0, 0.5), inset 0 0 10px rgba(255, 149, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+.boss-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 107, 0, 0) 0%, rgba(255, 107, 0, 0.1) 100%);
+    pointer-events: none;
+}
+
+.boss-description {
+    font-family: "Unbounded", sans-serif;
+    font-size: 0.9rem;
+    color: #ff9500;
+    font-style: italic;
+    position: relative;
+    z-index: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .bosses-title {
+        font-size: 2.5rem;
+        letter-spacing: 4px;
+    }
+
+    .bosses-subtitle {
+        font-size: 1rem;
+    }
+
+    .bosses-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 10px;
+    }
+
+    .boss-card {
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .menu-button-container {
+        top: 15px;
+        left: 15px;
+    }
+
+    .menu-button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    .defeat-bosses-section {
+        padding: 70px 20px 40px;
+        gap: 30px;
+    }
+}
