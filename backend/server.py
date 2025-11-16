@@ -34,6 +34,7 @@ MANA_COSTS = {
     "LIGHTNING": 25,
     "EXPLOSION_COMBO": 35,
     "HEALING_LIGHT_COMBO": 30,
+    "LIGHTNING_STRIKE_COMBO": 40,
     "PUNCH_COMBO": 10
 }
 
@@ -122,20 +123,24 @@ def get_command():
             # --- 3. SPELL LOGIC ---
             # Both checks passed! We can now cast a spell.
 
-            # COMBO DISABLED
-            # if current_gesture == "FIST" and last_gesture == "OPEN_PALM":
-            #     command = "EXPLOSION_COMBO"
-            #     combo_counter += 2
-                
+            # --- COMBO SYSTEM ENABLED ---
+            # Check for combos first (more complex, higher priority)
+            if current_gesture == "FIST" and last_gesture == "OPEN_PALM":
+                command = "EXPLOSION_COMBO"
+                combo_counter += 2
+            elif current_gesture == "POINT" and last_gesture == "OPEN_PALM":
+                command = "HEALING_LIGHT_COMBO"
+                combo_counter += 2
+            elif current_gesture == "FIST" and last_gesture == "POINT":
+                command = "LIGHTNING_STRIKE_COMBO"
+                combo_counter += 2
             # Single spells
-            if current_gesture == "FIST":
+            elif current_gesture == "FIST":
                 command = "FIREBALL"
                 combo_counter += 1
-
             elif current_gesture == "OPEN_PALM": 
                 command = "ICE_SHARD"
                 combo_counter += 1
-                
             elif current_gesture == "POINT": 
                 command = "LIGHTNING"
                 combo_counter += 1
