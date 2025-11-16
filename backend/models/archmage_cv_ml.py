@@ -34,8 +34,12 @@ class MLGestureRecognizer:
         
     def load_model(self):
         """Load the trained gesture classification model"""
-        model_file = 'gesture_model.pkl'
-        labels_file = 'gesture_labels.pkl'
+        # Get directory of this script and set data file paths
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        backend_dir = os.path.dirname(script_dir)
+        data_dir = os.path.join(backend_dir, 'data')
+        model_file = os.path.join(data_dir, 'gesture_model.pkl')
+        labels_file = os.path.join(data_dir, 'gesture_labels.pkl')
         
         if os.path.exists(model_file) and os.path.exists(labels_file):
             with open(model_file, 'rb') as f:
