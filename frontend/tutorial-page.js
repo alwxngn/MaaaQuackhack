@@ -1,10 +1,12 @@
 // Tutorial Page - Simplified version of game-page.js
-// Tutorial progress tracking
+// Tutorial progress tracking - now using counters
 let tutorialProgress = {
-    fireball: false,
-    iceShard: false,
-    lightning: false
+    fireball: 0,  // Count of fireballs cast (need 3)
+    iceShard: 0,  // Count of ice shards cast (need 3)
+    lightning: 0  // Count of lightnings cast (need 3)
 };
+
+const REQUIRED_CASTS = 2;
 
 let lastCommand = "NONE";
 let lastHandPosition = null;
@@ -179,15 +181,18 @@ function updateTutorialUI() {
     const instruction = document.getElementById('tutorial-instruction');
     const hint = document.getElementById('tutorial-hint');
     
-    if (!tutorialProgress.fireball) {
-        instruction.textContent = 'Cast FIREBALL (Make a FIST)';
-        hint.textContent = 'Make a FIST gesture to cast Fireball';
-    } else if (!tutorialProgress.iceShard) {
-        instruction.textContent = 'Cast ICE SHARD (OPEN PALM)';
-        hint.textContent = 'Open your PALM to cast Ice Shard';
-    } else if (!tutorialProgress.lightning) {
-        instruction.textContent = 'Cast LIGHTNING (POINT)';
-        hint.textContent = 'POINT your index finger to cast Lightning';
+    if (tutorialProgress.fireball < REQUIRED_CASTS) {
+        const remaining = REQUIRED_CASTS - tutorialProgress.fireball;
+        instruction.textContent = `Cast FIREBALL ${REQUIRED_CASTS} times (${tutorialProgress.fireball}/${REQUIRED_CASTS})`;
+        hint.textContent = `Make a FIST gesture to cast Fireball. ${remaining} more to go!`;
+    } else if (tutorialProgress.iceShard < REQUIRED_CASTS) {
+        const remaining = REQUIRED_CASTS - tutorialProgress.iceShard;
+        instruction.textContent = `Cast ICE SHARD ${REQUIRED_CASTS} times (${tutorialProgress.iceShard}/${REQUIRED_CASTS})`;
+        hint.textContent = `Open your PALM to cast Ice Shard. ${remaining} more to go!`;
+    } else if (tutorialProgress.lightning < REQUIRED_CASTS) {
+        const remaining = REQUIRED_CASTS - tutorialProgress.lightning;
+        instruction.textContent = `Cast LIGHTNING ${REQUIRED_CASTS} times (${tutorialProgress.lightning}/${REQUIRED_CASTS})`;
+        hint.textContent = `POINT your index finger to cast Lightning. ${remaining} more to go!`;
     } else {
         instruction.textContent = 'Great! Give a THUMBS UP to start!';
         hint.textContent = 'Extend your thumb up to begin the battle!';
@@ -198,9 +203,9 @@ function updateTutorialUI() {
     const iceItem = document.getElementById('progress-ice');
     const lightningItem = document.getElementById('progress-lightning');
     
-    if (tutorialProgress.fireball) fireballItem.classList.add('completed');
-    if (tutorialProgress.iceShard) iceItem.classList.add('completed');
-    if (tutorialProgress.lightning) lightningItem.classList.add('completed');
+    if (tutorialProgress.fireball >= REQUIRED_CASTS) fireballItem.classList.add('completed');
+    if (tutorialProgress.iceShard >= REQUIRED_CASTS) iceItem.classList.add('completed');
+    if (tutorialProgress.lightning >= REQUIRED_CASTS) lightningItem.classList.add('completed');
 }
 
 // Simplified fireball animation (no boss damage)
@@ -310,6 +315,96 @@ function playTutorialIceShard() {
     }, 30);
 }
 
+// Show countdown screen before battle
+function showCountdownScreen() {
+    // Hide tutorial overlay
+    const tutorialOverlay = document.getElementById('tutorial-overlay');
+    if (tutorialOverlay) {
+        tutorialOverlay.style.display = 'none';
+    }
+    
+    // Create countdown overlay
+    const countdownOverlay = document.createElement('div');
+    countdownOverlay.id = 'countdown-overlay';
+    countdownOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 20000;
+        color: white;
+        font-family: 'Orbitron', sans-serif;
+    `;
+    
+    const countdownContent = document.createElement('div');
+    countdownContent.style.cssText = `
+        text-align: center;
+    `;
+    
+    const countdownNumber = document.createElement('div');
+    countdownNumber.id = 'countdown-number';
+    countdownNumber.style.cssText = `
+        font-size: 120px;
+        font-weight: 900;
+        color: #FFD700;
+        text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        font-family: 'Bungee', cursive;
+        margin-bottom: 30px;
+        animation: pulse 0.5s ease-in-out;
+    `;
+    
+    const tipText = document.createElement('div');
+    tipText.id = 'countdown-tip';
+    tipText.style.cssText = `
+        font-size: 28px;
+        color: #00FF00;
+        margin-top: 40px;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+        max-width: 600px;
+        line-height: 1.4;
+    `;
+    tipText.textContent = '💡 TIP: Pick up mana and health orbs by connecting your spells to them!                This boss will have three stages';
+    
+    countdownContent.appendChild(countdownNumber);
+    countdownContent.appendChild(tipText);
+    countdownOverlay.appendChild(countdownContent);
+    document.body.appendChild(countdownOverlay);
+    
+    // Countdown logic
+    let count = 3;
+    countdownNumber.textContent = count;
+    
+    const countdownInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+            countdownNumber.textContent = count;
+            // Add pulse animation
+            countdownNumber.style.animation = 'none';
+            setTimeout(() => {
+                countdownNumber.style.animation = 'pulse 0.5s ease-in-out';
+            }, 10);
+        } else if (count === 0) {
+            countdownNumber.textContent = 'GO!';
+            countdownNumber.style.fontSize = '140px';
+            countdownNumber.style.color = '#00FF00';
+            countdownNumber.style.textShadow = '0 0 40px rgba(0, 255, 0, 1)';
+        } else {
+            clearInterval(countdownInterval);
+            // Redirect to game
+            setTimeout(() => {
+                window.location.href = 'game-page.html';
+            }, 500);
+        }
+    }, 1000);
+}
+
 // Simplified lightning animation
 function playTutorialLightning() {
     if (sounds.thunder) {
@@ -370,44 +465,43 @@ async function tutorialLoop() {
         return;
     }
     
-    // Check for spells and mark as complete
+    // Check for spells and increment counters
     const isNewCommand = command !== "NONE" && command !== "COOLDOWN" && command !== lastCommand;
     
     if (isNewCommand) {
-        if (command === "FIREBALL" && !tutorialProgress.fireball) {
-            tutorialProgress.fireball = true;
+        if (command === "FIREBALL" && tutorialProgress.fireball < REQUIRED_CASTS) {
+            tutorialProgress.fireball++;
             playTutorialFireball();
             updateTutorialUI();
-            console.log("✓ Fireball learned!");
-        } else if (command === "ICE_SHARD" && !tutorialProgress.iceShard) {
-            tutorialProgress.iceShard = true;
+            console.log(`✓ Fireball cast ${tutorialProgress.fireball}/${REQUIRED_CASTS}!`);
+        } else if (command === "ICE_SHARD" && tutorialProgress.iceShard < REQUIRED_CASTS && tutorialProgress.fireball >= REQUIRED_CASTS) {
+            tutorialProgress.iceShard++;
             playTutorialIceShard();
             updateTutorialUI();
-            console.log("✓ Ice Shard learned!");
-        } else if (command === "LIGHTNING" && !tutorialProgress.lightning) {
-            tutorialProgress.lightning = true;
+            console.log(`✓ Ice Shard cast ${tutorialProgress.iceShard}/${REQUIRED_CASTS}!`);
+        } else if (command === "LIGHTNING" && tutorialProgress.lightning < REQUIRED_CASTS && tutorialProgress.iceShard >= REQUIRED_CASTS) {
+            tutorialProgress.lightning++;
             playTutorialLightning();
             updateTutorialUI();
-            console.log("✓ Lightning learned!");
+            console.log(`✓ Lightning cast ${tutorialProgress.lightning}/${REQUIRED_CASTS}!`);
         }
         
         lastCommand = command;
     }
     
     // Check for thumbs up after all spells are learned
-    if (tutorialProgress.fireball && tutorialProgress.iceShard && tutorialProgress.lightning) {
+    if (tutorialProgress.fireball >= REQUIRED_CASTS && tutorialProgress.iceShard >= REQUIRED_CASTS && tutorialProgress.lightning >= REQUIRED_CASTS) {
         if (command === "THUMBS_UP" || lastSentGesture === "THUMBS_UP") {
-            console.log("Thumbs up detected! Starting battle...");
+            console.log("Thumbs up detected! Starting countdown...");
             // Reset mana to normal before redirecting
             fetch('http://localhost:5001/add_mana', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({amount: -899}) // Reset from 999 to 100
             }).catch(() => {});
-            // Small delay then redirect
-            setTimeout(() => {
-                window.location.href = 'game-page.html';
-            }, 500);
+            
+            // Show countdown screen
+            showCountdownScreen();
             return;
         }
     }
