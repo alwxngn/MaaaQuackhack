@@ -161,7 +161,7 @@ Dynamic boss encounters:
 - *Screenshot 1: Title Screen*
    <img width="1710" height="980" alt="Screenshot 2025-11-16 at 9 58 58 AM" src="https://github.com/user-attachments/assets/f0af6b36-a2aa-4c19-87fa-1727a9e2dff9" />
 - *Screenshot 2: Gameplay with gesture detection*
-  <img width="1710" height="883" alt="Screenshot 2025-11-16 at 9 58 16 AM" src="https://github.com/user-attachments/assets/3dd7d87a-2a75-492c-9738-cf4032a20205" />
+  <img width="1710" height="880" alt="Screenshot 2025-11-16 at 9 58 15 AM" src="https://github.com/user-attachments/assets/8b4894c1-a0b4-433d-9d93-00c18a406be9" />
 - *Screenshot 3: Controls*
   <img width="1710" height="982" alt="Screenshot 2025-11-16 at 9 59 12 AM" src="https://github.com/user-attachments/assets/fe0ff8ee-4ea2-4d23-8b13-b9c8079737f8" />
 - *Screenshot 4: Bosses*
