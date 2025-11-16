@@ -58,8 +58,7 @@ EVENT_COOLDOWN = 10  # seconds
 last_event_end_time = 0
 
 # possible events
-POSSIBLE_EVENTS = ["WEAKFIRE", "WEAKICE",
-    "EXPLOSION_CHALLENGE", "HEAL_LIGHT_CHALLENGE"]
+POSSIBLE_EVENTS = ["WEAKFIRE", "WEAKICE"]
 
 # State for tracking challenge progress
 challenge_progress = 0
@@ -278,26 +277,6 @@ def get_command():
             challenge_progress = 0
             challenge_target = 0
             challenge_gesture = "NONE"
-        
-      
-
-        # --- COMBO_CHALLENGE checks ---
-        elif current_event == "EXPLOSION_CHALLENGE":
-            # Check if the *command* (calculated above) is the one we want
-            if command == "EXPLOSION_COMBO":
-                print("COMBO CHALLENGE COMPLETE!")
-                command = "CHALLENGE_SUCCESS" # Overwrite/upgrade the command!
-                # Reset event state
-                current_event = "NONE"
-                last_event_end_time = current_time
-        
-        elif current_event == "HEAL_LIGHT_CHALLENGE":
-            if command == "HEALING_LIGHT_COMBO":
-                print("COMBO CHALLENGE COMPLETE!")
-                command = "CHALLENGE_SUCCESS" # Overwrite/upgrade the command!
-                # Reset event state
-                current_event = "NONE"
-                last_event_end_time = current_time
 
     # 2. Else, check if the "calm" period is over and start a new event
     elif (current_time - last_event_end_time) > EVENT_COOLDOWN:

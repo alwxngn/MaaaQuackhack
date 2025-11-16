@@ -2139,7 +2139,7 @@ async function gameLoop(){
             showDamageNumber(hp, x, y, '#00FF00', true); // Green for healing (true = isHealing)
         }
         updateBossHealth(bossHealth - damage);
-        updatePlayerHealth(playerHealth + hp);
+        updatePlayerHealth(Math.min(MAX_PLAYER_HEALTH, playerHealth + hp));
     }
     else if (command === "LIGHTNING_STRIKE_COMBO") {
         let damage = 35; // Very high damage
