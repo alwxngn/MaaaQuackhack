@@ -7,7 +7,7 @@
 body {
     font-family: "Unbounded", sans-serif;
     overflow: hidden;
-    background: #1a0f0a;
+    background: #0a0805;
     min-height: 100vh;
     position: relative;
 }
@@ -26,11 +26,11 @@ body {
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(ellipse at 20% 50%, rgba(139, 69, 19, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(101, 50, 15, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 40% 20%, rgba(139, 69, 19, 0.25) 0%, transparent 40%);
+        radial-gradient(ellipse at 20% 50%, rgba(40, 25, 15, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(30, 20, 12, 0.25) 0%, transparent 50%),
+        radial-gradient(ellipse at 40% 20%, rgba(35, 22, 14, 0.2) 0%, transparent 40%);
     background-size: 100% 100%;
-    opacity: 0.8;
+    opacity: 0.6;
 }
 
 .fire-particles {
@@ -38,21 +38,21 @@ body {
     width: 100%;
     height: 100%;
     background-image: 
-        radial-gradient(circle at 10% 20%, rgba(255, 100, 0, 0.15) 0%, transparent 25%),
-        radial-gradient(circle at 85% 15%, rgba(255, 50, 0, 0.12) 0%, transparent 30%),
-        radial-gradient(circle at 50% 85%, rgba(255, 69, 0, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 20% 80%, rgba(200, 50, 0, 0.08) 0%, transparent 35%);
-    animation: fireFlicker 3s ease-in-out infinite;
+        radial-gradient(circle at 10% 20%, rgba(100, 60, 40, 0.08) 0%, transparent 25%),
+        radial-gradient(circle at 85% 15%, rgba(80, 50, 30, 0.06) 0%, transparent 30%),
+        radial-gradient(circle at 50% 85%, rgba(90, 55, 35, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 20% 80%, rgba(70, 45, 28, 0.04) 0%, transparent 35%);
+    animation: fireFlicker 4s ease-in-out infinite;
 }
 
 @keyframes fireFlicker {
     0%, 100% {
-        opacity: 0.6;
+        opacity: 0.5;
         filter: brightness(0.9);
     }
     50% {
-        opacity: 0.8;
-        filter: brightness(1.1);
+        opacity: 0.6;
+        filter: brightness(1.0);
     }
 }
 
@@ -88,32 +88,32 @@ body {
 
 h1 {
     font-family: "Unbounded", sans-serif;
-    font-size: 120px;
+    font-size: 100px;
     font-weight: 800;
     margin-bottom: 20px;
-    color: #ff4500;
+    color: #d4a060;
     text-shadow: 
-        0 0 20px rgba(255, 69, 0, 0.8),
-        0 0 40px rgba(255, 100, 0, 0.5),
-        3px 3px 0px #2a1810;
-    animation: fireGlow 2s ease-in-out infinite;
-    letter-spacing: 3px;
+        0 0 8px rgba(200, 140, 80, 0.6),
+        0 0 15px rgba(180, 120, 70, 0.4),
+        1px 1px 3px rgba(0, 0, 0, 0.8);
+    animation: fireGlow 4s ease-in-out infinite;
+    letter-spacing: 4px;
 }
 
 @keyframes fireGlow {
     0%, 100% {
         text-shadow: 
-            0 0 20px rgba(255, 69, 0, 0.8),
-            0 0 40px rgba(255, 100, 0, 0.5),
-            3px 3px 0px #2a1810;
-        color: #ff4500;
+            0 0 8px rgba(200, 140, 80, 0.6),
+            0 0 15px rgba(180, 120, 70, 0.4),
+            1px 1px 3px rgba(0, 0, 0, 0.8);
+        color: #d4a060;
     }
     50% {
         text-shadow: 
-            0 0 30px rgba(255, 69, 0, 1),
-            0 0 60px rgba(255, 140, 0, 0.7),
-            3px 3px 0px #2a1810;
-        color: #ff6347;
+            0 0 12px rgba(200, 140, 80, 0.8),
+            0 0 20px rgba(180, 120, 70, 0.6),
+            1px 1px 3px rgba(0, 0, 0, 0.8);
+        color: #e4b070;
     }
 }
 
@@ -128,27 +128,29 @@ h1 {
     bottom: -10px;
     left: 0;
     right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, transparent, #ff4500, #ff6347, #ff4500, transparent);
-    animation: fireWave 1.5s ease-in-out infinite;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(200, 140, 80, 0.6), rgba(180, 120, 70, 0.8), rgba(200, 140, 80, 0.6), transparent);
+    animation: fireWave 3s ease-in-out infinite;
 }
 
 @keyframes fireWave {
     0%, 100% {
         transform: scaleX(1);
+        opacity: 0.7;
     }
     50% {
-        transform: scaleX(1.1);
+        transform: scaleX(1.05);
+        opacity: 1;
     }
 }
 
 .subtitle-dark {
-    font-size: 28px;
-    color: #ff6347;
-    font-weight: 700;
-    letter-spacing: 3px;
+    font-size: 24px;
+    color: #c4b090;
+    font-weight: 600;
+    letter-spacing: 2px;
     animation: fadeInUp 1.5s ease-out;
-    text-shadow: 0 0 15px rgba(255, 99, 71, 0.7);
+    text-shadow: 0 0 6px rgba(180, 160, 120, 0.4), 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .button-container {
@@ -163,22 +165,19 @@ h1 {
     position: relative;
     display: inline-block;
     text-decoration: none;
-    padding: 25px 80px;
-    font-size: 36px;
-    font-weight: 800;
-    letter-spacing: 4px;
-    color: #fff8dc;
-    background: linear-gradient(135deg, #cc3300, #ff4500);
-    border: 3px solid #ff4500;
+    padding: 20px 70px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #e8e8e8;
+    background: linear-gradient(135deg, #b46040, #c47858);
+    border: 2px solid rgba(200, 140, 100, 0.6);
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
     transition: all 0.3s ease;
-    animation: firebreath 2.5s ease-in-out infinite;
-    box-shadow: 
-        0 0 30px rgba(255, 69, 0, 0.6),
-        inset 0 0 20px rgba(255, 140, 0, 0.3),
-        0 5px 20px rgba(0, 0, 0, 0.8);
+    animation: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     font-family: "Unbounded", sans-serif;
     text-transform: uppercase;
 }
@@ -190,113 +189,49 @@ h1 {
     padding: 18px 60px;
     font-size: 24px;
     font-weight: 700;
-    letter-spacing: 3px;
-    color: #ffe4b5;
-    background: linear-gradient(135deg, #8b4513, #a0522d);
-    border: 2px solid #cd853f;
+    letter-spacing: 2px;
+    color: #e8e8e8;
+    background: linear-gradient(135deg, #706050, #807060);
+    border: 2px solid rgba(120, 100, 80, 0.6);
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 
-        0 0 20px rgba(205, 133, 63, 0.4),
-        inset 0 0 15px rgba(160, 82, 45, 0.3),
-        0 5px 15px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     font-family: "Unbounded", sans-serif;
     text-transform: uppercase;
 }
 
 .instructions-button-dark::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(205, 133, 63, 0.3), transparent);
-    animation: instructionsGlow 2s ease-in-out infinite;
-}
-
-@keyframes instructionsGlow {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 0.3;
-    }
-    50% {
-        transform: scale(1.05);
-        opacity: 0.5;
-    }
+    display: none;
 }
 
 .instructions-button-dark:hover {
     transform: translateY(-3px);
-    background: linear-gradient(135deg, #a0522d, #cd853f);
-    box-shadow: 
-        0 0 40px rgba(205, 133, 63, 0.6),
-        inset 0 0 20px rgba(210, 180, 140, 0.4),
-        0 10px 25px rgba(205, 133, 63, 0.3);
-    color: #fff;
+    background: linear-gradient(135deg, #807060, #706050);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    color: #f0f0f0;
 }
 
 .instructions-button-dark:active {
     transform: translateY(-1px);
-    box-shadow: 
-        0 0 25px rgba(205, 133, 63, 0.5),
-        inset 0 0 15px rgba(160, 82, 45, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .play-button-dark::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 140, 0, 0.4), transparent);
-    animation: fireAura 2s ease-in-out infinite;
-}
-
-@keyframes fireAura {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 0.4;
-    }
-    50% {
-        transform: scale(1.1);
-        opacity: 0.7;
-    }
-}
-
-@keyframes firebreath {
-    0%, 100% {
-        box-shadow: 
-            0 0 30px rgba(255, 69, 0, 0.6),
-            inset 0 0 20px rgba(255, 140, 0, 0.3),
-            0 5px 20px rgba(0, 0, 0, 0.8);
-    }
-    50% {
-        box-shadow: 
-            0 0 50px rgba(255, 69, 0, 0.9),
-            inset 0 0 30px rgba(255, 140, 0, 0.5),
-            0 10px 30px rgba(255, 69, 0, 0.4);
-    }
+    display: none;
 }
 
 .play-button-dark:hover {
-    transform: translateY(-5px);
-    background: linear-gradient(135deg, #ff4500, #ff6347);
-    box-shadow: 
-        0 0 60px rgba(255, 69, 0, 0.9),
-        inset 0 0 30px rgba(255, 140, 0, 0.5),
-        0 15px 40px rgba(255, 69, 0, 0.5);
-    color: #ffe4b5;
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #c47858, #b46040);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    color: #f0f0f0;
 }
 
 .play-button-dark:active {
-    transform: translateY(-2px);
-    box-shadow: 
-        0 0 40px rgba(255, 69, 0, 0.7),
-        inset 0 0 20px rgba(255, 140, 0, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .button-text {
@@ -316,10 +251,10 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
-    padding: 25px 35px;
-    background: rgba(139, 69, 19, 0.3);
-    border: 2px solid rgba(255, 69, 0, 0.5);
+    gap: 12px;
+    padding: 20px 30px;
+    background: rgba(40, 30, 20, 0.4);
+    border: 2px solid rgba(140, 100, 80, 0.5);
     border-radius: 8px;
     transition: all 0.3s ease;
     cursor: pointer;
@@ -327,25 +262,23 @@ h1 {
 }
 
 .feature-dark:hover {
-    background: rgba(255, 69, 0, 0.15);
-    border-color: rgba(255, 69, 0, 0.9);
-    transform: translateY(-8px);
-    box-shadow: 
-        0 15px 35px rgba(255, 69, 0, 0.3),
-        0 0 20px rgba(255, 69, 0, 0.4);
+    background: rgba(60, 45, 30, 0.5);
+    border-color: rgba(160, 120, 90, 0.7);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .feature-icon {
-    font-size: 48px;
-    animation: fireFloat 3s ease-in-out infinite;
+    font-size: 40px;
+    animation: fireFloat 4s ease-in-out infinite;
 }
 
 .feature-dark:nth-child(2) .feature-icon {
-    animation-delay: 0.3s;
+    animation-delay: 0.4s;
 }
 
 .feature-dark:nth-child(3) .feature-icon {
-    animation-delay: 0.6s;
+    animation-delay: 0.8s;
 }
 
 @keyframes fireFloat {
@@ -353,15 +286,15 @@ h1 {
         transform: translateY(0px);
     }
     50% {
-        transform: translateY(-12px);
+        transform: translateY(-6px);
     }
 }
 
 .feature-dark p {
-    color: #ff6347;
-    font-size: 18px;
+    color: #c4b090;
+    font-size: 16px;
     font-weight: 600;
     letter-spacing: 1px;
     margin: 0;
-    text-shadow: 0 0 10px rgba(255, 99, 71, 0.5);
+    text-shadow: 0 0 4px rgba(180, 160, 120, 0.3), 1px 1px 2px rgba(0, 0, 0, 0.8);
 }

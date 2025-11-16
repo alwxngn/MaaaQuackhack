@@ -9,15 +9,15 @@ body {
     margin: 60px;
     margin-top: 50px;
     overflow: hidden;
-    background: radial-gradient(circle at center, rgba(139, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%);
+    background: radial-gradient(circle at center, rgba(30, 10, 10, 0.9) 0%, rgba(0, 0, 0, 0.95) 100%);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    color: #ffe4b5;
+    color: #e8e8e8;
     position: relative;
 }
 
-/* Lava background fire effect */
+/* Lava background fire effect - toned down */
 body::before {
     content: '';
     position: fixed;
@@ -28,7 +28,8 @@ body::before {
     background-image: url("../assets/lava_background.png");
     background-size: cover;
     background-position: center;
-    opacity: 0.6;
+    opacity: 0.25;
+    filter: brightness(0.6) saturate(0.7);
     z-index: -1;
     animation: lavaFlow 20s ease-in-out infinite;
 }
@@ -102,7 +103,7 @@ body::after {
     font-size: 16px;
     font-weight: 700;
     letter-spacing: 2px;
-    color: #ff6347;
+    color: #c4c4c4;
     text-shadow: none;
     margin-bottom: 8px;
     text-transform: uppercase;
@@ -111,20 +112,20 @@ body::after {
 .player-hp-wrapper, .boss-hp-wrapper {
     height: 35px;
     width: 300px;
-    border: 3px solid rgba(255, 69, 0, 0.7);
-    background: rgba(139, 69, 19, 0.4);
+    border: 2px solid rgba(180, 60, 40, 0.5);
+    background: rgba(40, 20, 15, 0.6);
     margin-top: 5px;
     margin-bottom: 15px;
     position: relative;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 6px;
     box-shadow: none;
 }
 
 .hp-bar-fill {
     height: 100%;
     width: 100%;
-    background: linear-gradient(90deg, #cc3300, #ff4500, #ff6347);
+    background: linear-gradient(90deg, #b43c28, #d4513e, #e86654);
     transition: width 0.3s ease;
     position: absolute;
     top: 0;
@@ -145,19 +146,19 @@ body::after {
 .mana-wrapper {
     height: 30px;
     width: 300px;
-    border: 3px solid rgba(65, 105, 225, 0.7);
-    background: rgba(26, 26, 46, 0.6);
+    border: 2px solid rgba(70, 100, 180, 0.5);
+    background: rgba(20, 25, 40, 0.6);
     margin-top: 5px;
     position: relative;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 6px;
     box-shadow: none;
 }
 
 .mana-bar-fill {
     height: 100%;
     width: 100%;
-    background: linear-gradient(90deg, #1976D2, #4169E1, #64B5F6);
+    background: linear-gradient(90deg, #3a5f9e, #4a6fb8, #5a7fc2);
     transition: width 0.3s ease;
     position: absolute;
     top: 0;
@@ -179,32 +180,32 @@ body::after {
     position: absolute;
     width: 50px;
     height: 50px;
-    background: radial-gradient(circle, #64B5F6 0%, #1976D2 80%, #0D47A1 100%);
+    background: radial-gradient(circle, #5a7fc2 0%, #3a5f9e 80%, #2a4f8e 100%);
     border-radius: 50%;
-    border: 3px solid rgba(13, 71, 161, 0.8);
+    border: 2px solid rgba(50, 70, 140, 0.6);
     box-shadow: 
-        0 0 25px rgba(100, 181, 246, 1),
-        0 0 40px rgba(65, 105, 225, 0.6),
-        inset 0 0 15px rgba(255, 255, 255, 0.3);
+        0 0 12px rgba(90, 127, 194, 0.6),
+        0 0 20px rgba(65, 105, 180, 0.3),
+        inset 0 0 10px rgba(255, 255, 255, 0.2);
     z-index: 20;
     pointer-events: none;
-    animation: manaBallPulse 1.5s ease-in-out infinite;
+    animation: manaBallPulse 2s ease-in-out infinite;
 }
 
 @keyframes manaBallPulse {
     0%, 100% { 
         transform: scale(1); 
         box-shadow: 
-            0 0 25px rgba(100, 181, 246, 1),
-            0 0 40px rgba(65, 105, 225, 0.6),
-            inset 0 0 15px rgba(255, 255, 255, 0.3);
+            0 0 12px rgba(90, 127, 194, 0.6),
+            0 0 20px rgba(65, 105, 180, 0.3),
+            inset 0 0 10px rgba(255, 255, 255, 0.2);
     }
     50% { 
-        transform: scale(1.15); 
+        transform: scale(1.1); 
         box-shadow: 
-            0 0 35px rgba(100, 181, 246, 1),
-            0 0 60px rgba(65, 105, 225, 0.8),
-            inset 0 0 20px rgba(255, 255, 255, 0.5);
+            0 0 18px rgba(90, 127, 194, 0.8),
+            0 0 30px rgba(65, 105, 180, 0.5),
+            inset 0 0 12px rgba(255, 255, 255, 0.3);
     }
 }
 
@@ -212,32 +213,32 @@ body::after {
     position: absolute;
     width: 45px;
     height: 45px;
-    background: radial-gradient(circle, #00FF88 0%, #00CC70 60%, #008855 100%);
+    background: radial-gradient(circle, #60c888 0%, #50b878 60%, #40a868 100%);
     border-radius: 50%;
-    border: 3px solid rgba(0, 204, 112, 0.9);
+    border: 2px solid rgba(64, 168, 104, 0.7);
     box-shadow: 
-        0 0 30px rgba(0, 255, 136, 1),
-        0 0 50px rgba(0, 204, 112, 0.7),
-        inset 0 0 20px rgba(255, 255, 255, 0.4);
+        0 0 15px rgba(96, 200, 136, 0.6),
+        0 0 25px rgba(80, 184, 120, 0.4),
+        inset 0 0 12px rgba(255, 255, 255, 0.25);
     z-index: 20;
     pointer-events: none;
-    animation: healOrbPulse 1.8s ease-in-out infinite;
+    animation: healOrbPulse 2s ease-in-out infinite;
 }
 
 @keyframes healOrbPulse {
     0%, 100% { 
         transform: scale(1); 
         box-shadow: 
-            0 0 30px rgba(0, 255, 136, 1),
-            0 0 50px rgba(0, 204, 112, 0.7),
-            inset 0 0 20px rgba(255, 255, 255, 0.4);
+            0 0 15px rgba(96, 200, 136, 0.6),
+            0 0 25px rgba(80, 184, 120, 0.4),
+            inset 0 0 12px rgba(255, 255, 255, 0.25);
     }
     50% { 
-        transform: scale(1.2); 
+        transform: scale(1.1); 
         box-shadow: 
-            0 0 40px rgba(0, 255, 136, 1),
-            0 0 70px rgba(0, 204, 112, 0.9),
-            inset 0 0 25px rgba(255, 255, 255, 0.6);
+            0 0 20px rgba(96, 200, 136, 0.8),
+            0 0 35px rgba(80, 184, 120, 0.6),
+            inset 0 0 15px rgba(255, 255, 255, 0.35);
     }
 }
 
@@ -315,18 +316,18 @@ body::after {
     left: 50%;
     transform: translateX(-50%);
     font-family: "Unbounded", sans-serif;
-    font-size: 36px;
-    font-weight: 800;
-    letter-spacing: 3px;
-    color: #fff8dc;
-    background: linear-gradient(135deg, rgba(204, 51, 0, 0.95), rgba(255, 69, 0, 0.95));
-    padding: 20px 50px;
-    border-radius: 12px;
-    border: 3px solid #ff4500;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #e8e8e8;
+    background: linear-gradient(135deg, rgba(80, 30, 20, 0.85), rgba(100, 40, 30, 0.85));
+    padding: 16px 40px;
+    border-radius: 8px;
+    border: 2px solid rgba(180, 80, 60, 0.6);
     text-align: center;
     z-index: 1000;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
-    box-shadow: none;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     animation: none;
     text-transform: uppercase;
 }
@@ -353,42 +354,24 @@ body::after {
     left: 50%;
     transform: translateX(-50%);
     font-family: 'Orbitron', sans-serif;
-    font-size: 48px;
-    font-weight: 900;
-    letter-spacing: 4px;
-    color: #FFD700;
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: #d4b860;
     text-align: center;
     z-index: 999;
     text-shadow: 
-        0 0 20px rgba(255, 215, 0, 1),
-        0 0 40px rgba(255, 215, 0, 0.8),
-        0 0 60px rgba(255, 215, 0, 0.6),
-        2px 2px 4px rgba(0, 0, 0, 0.9);
+        0 0 10px rgba(212, 184, 96, 0.6),
+        0 0 20px rgba(212, 184, 96, 0.4),
+        1px 1px 3px rgba(0, 0, 0, 0.8);
     opacity: 0;
     transition: opacity 0.3s ease, transform 0.3s ease;
     pointer-events: none;
-    animation: comboGlow 1.5s ease-in-out infinite;
+    animation: none;
 }
 
 .combo-display[style*="opacity: 1"] {
-    animation: comboGlow 1.5s ease-in-out infinite, comboBounce 0.5s ease-out;
-}
-
-@keyframes comboGlow {
-    0%, 100% {
-        text-shadow: 
-            0 0 20px rgba(255, 215, 0, 1),
-            0 0 40px rgba(255, 215, 0, 0.8),
-            0 0 60px rgba(255, 215, 0, 0.6),
-            2px 2px 4px rgba(0, 0, 0, 0.9);
-    }
-    50% {
-        text-shadow: 
-            0 0 30px rgba(255, 215, 0, 1),
-            0 0 60px rgba(255, 215, 0, 1),
-            0 0 90px rgba(255, 215, 0, 0.8),
-            2px 2px 4px rgba(0, 0, 0, 0.9);
-    }
+    animation: comboBounce 0.5s ease-out;
 }
 
 @keyframes comboBounce {

@@ -744,14 +744,14 @@ function showGameOverScreen(isVictory) {
     overlay.id = 'game-over-overlay';
     
     if (isVictory) {
-        // Fiery victory background
+        // Clean victory background
         overlay.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, rgba(139, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%);
+            background: radial-gradient(circle at center, rgba(40, 20, 15, 0.95) 0%, rgba(10, 5, 5, 0.98) 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -760,51 +760,15 @@ function showGameOverScreen(isVictory) {
             animation: fadeIn 0.5s ease-in;
             overflow: hidden;
         `;
-        
-        // Create fire particles background
-        const fireContainer = document.createElement('div');
-        fireContainer.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        `;
-        
-        // Add animated fire effect
-        for (let i = 0; i < 30; i++) {
-            const flame = document.createElement('div');
-            const x = Math.random() * 100;
-            const delay = Math.random() * 2;
-            const duration = 2 + Math.random() * 2;
-            flame.style.cssText = `
-                position: absolute;
-                bottom: ${Math.random() * 20}%;
-                left: ${x}%;
-                width: ${20 + Math.random() * 30}px;
-                height: ${40 + Math.random() * 60}px;
-                background: linear-gradient(to top, 
-                    rgba(255, 100, 0, 0.8) 0%,
-                    rgba(255, 200, 0, 0.6) 50%,
-                    rgba(255, 255, 255, 0.3) 100%);
-                border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-                animation: flicker ${duration}s ${delay}s infinite ease-in-out;
-                filter: blur(2px);
-            `;
-            fireContainer.appendChild(flame);
-        }
-        overlay.appendChild(fireContainer);
     } else {
-        // Dark fiery defeat background
+        // Clean defeat background
         overlay.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, rgba(30, 0, 0, 0.98) 0%, rgba(0, 0, 0, 1) 100%);
+            background: radial-gradient(circle at center, rgba(20, 5, 5, 0.95) 0%, rgba(5, 0, 0, 0.98) 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -813,42 +777,6 @@ function showGameOverScreen(isVictory) {
             animation: fadeIn 0.5s ease-in;
             overflow: hidden;
         `;
-        
-        // Create dark fire/embers background for defeat
-        const fireContainer = document.createElement('div');
-        fireContainer.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        `;
-        
-        // Add dark ember effects
-        for (let i = 0; i < 25; i++) {
-            const ember = document.createElement('div');
-            const x = Math.random() * 100;
-            const delay = Math.random() * 3;
-            const duration = 3 + Math.random() * 2;
-            ember.style.cssText = `
-                position: absolute;
-                bottom: ${Math.random() * 30}%;
-                left: ${x}%;
-                width: ${10 + Math.random() * 20}px;
-                height: ${30 + Math.random() * 50}px;
-                background: linear-gradient(to top, 
-                    rgba(80, 0, 0, 0.9) 0%,
-                    rgba(139, 0, 0, 0.7) 50%,
-                    rgba(200, 0, 0, 0.3) 100%);
-                border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-                animation: flicker ${duration}s ${delay}s infinite ease-in-out;
-                filter: blur(3px);
-            `;
-            fireContainer.appendChild(ember);
-        }
-        overlay.appendChild(fireContainer);
     }
     
     // Add animations and styles
@@ -884,20 +812,15 @@ function showGameOverScreen(isVictory) {
         @keyframes burn {
             0%, 100% {
                 text-shadow: 
-                    0 0 10px #FF4500,
-                    0 0 20px #FF4500,
-                    0 0 30px #FF6347,
-                    0 0 40px #FF4500,
-                    0 0 70px #FF4500;
+                    0 0 8px rgba(200, 100, 60, 0.6),
+                    0 0 15px rgba(180, 80, 50, 0.4),
+                    1px 1px 3px rgba(0, 0, 0, 0.8);
             }
             50% {
                 text-shadow: 
-                    0 0 20px #FF6347,
-                    0 0 30px #FF6347,
-                    0 0 40px #FF4500,
-                    0 0 50px #FF4500,
-                    0 0 80px #FF6347,
-                    0 0 100px #FF4500;
+                    0 0 12px rgba(200, 100, 60, 0.8),
+                    0 0 20px rgba(180, 80, 50, 0.6),
+                    1px 1px 3px rgba(0, 0, 0, 0.8);
             }
         }
         @keyframes glow {
@@ -911,20 +834,15 @@ function showGameOverScreen(isVictory) {
         @keyframes defeatPulse {
             0%, 100% {
                 text-shadow: 
-                    0 0 15px #8B0000,
-                    0 0 25px #8B0000,
-                    0 0 35px #CC0000,
-                    0 0 45px #8B0000,
-                    0 0 65px #660000;
+                    0 0 8px rgba(120, 40, 40, 0.6),
+                    0 0 15px rgba(100, 30, 30, 0.4),
+                    1px 1px 3px rgba(0, 0, 0, 0.8);
             }
             50% {
                 text-shadow: 
-                    0 0 25px #CC0000,
-                    0 0 35px #CC0000,
-                    0 0 45px #8B0000,
-                    0 0 55px #660000,
-                    0 0 75px #8B0000,
-                    0 0 95px #CC0000;
+                    0 0 12px rgba(120, 40, 40, 0.8),
+                    0 0 20px rgba(100, 30, 30, 0.6),
+                    1px 1px 3px rgba(0, 0, 0, 0.8);
             }
         }
         @keyframes bossMoveBackForth {
@@ -947,54 +865,40 @@ function showGameOverScreen(isVictory) {
     const title = document.createElement('h1');
     title.textContent = isVictory ? 'VICTORY' : 'DEFEAT';
     title.style.cssText = `
-        color: ${isVictory ? '#FF4500' : '#8B0000'};
-        font-size: 96px;
-        font-weight: 900;
+        color: ${isVictory ? '#d4a060' : '#b08080'};
+        font-size: 80px;
+        font-weight: 800;
         margin-bottom: 30px;
-        letter-spacing: 8px;
+        letter-spacing: 6px;
         text-transform: uppercase;
-        animation: ${isVictory ? 'burn 2s ease-in-out infinite, slideUp 0.8s ease-out' : 'defeatPulse 2s ease-in-out infinite, slideUp 0.8s ease-out'};
-        font-family: 'Bungee', cursive;
+        animation: ${isVictory ? 'burn 3s ease-in-out infinite, slideUp 0.8s ease-out' : 'defeatPulse 3s ease-in-out infinite, slideUp 0.8s ease-out'};
+        font-family: 'Orbitron', sans-serif;
         position: relative;
         z-index: 10;
         text-shadow: ${isVictory ? `
-            0 0 10px #FF4500,
-            0 0 20px #FF4500,
-            0 0 30px #FF6347,
-            0 0 40px #FF4500,
-            0 0 70px #FF4500,
-            2px 2px 4px rgba(0,0,0,0.8)
+            0 0 8px rgba(200, 100, 60, 0.6),
+            0 0 15px rgba(180, 80, 50, 0.4),
+            1px 1px 3px rgba(0,0,0,0.8)
         ` : `
-            0 0 15px #8B0000,
-            0 0 25px #8B0000,
-            0 0 35px #CC0000,
-            0 0 45px #8B0000,
-            0 0 65px #660000,
-            2px 2px 4px rgba(0,0,0,0.9)
+            0 0 8px rgba(120, 40, 40, 0.6),
+            0 0 15px rgba(100, 30, 30, 0.4),
+            1px 1px 3px rgba(0,0,0,0.8)
         `};
     `;
     
     // Add stats
     const stats = document.createElement('div');
     stats.style.cssText = `
-        color: ${isVictory ? '#FFD700' : '#CCCCCC'};
-        font-size: 28px;
+        color: ${isVictory ? '#d4b860' : '#c4c4c4'};
+        font-size: 24px;
         margin-bottom: 40px;
         text-align: center;
         animation: slideUp 0.5s ease-out 0.3s both;
         font-family: 'Orbitron', sans-serif;
-        font-weight: 700;
+        font-weight: 600;
         position: relative;
         z-index: 10;
-        text-shadow: ${isVictory ? `
-            0 0 10px rgba(255, 215, 0, 0.8),
-            0 0 20px rgba(255, 140, 0, 0.6),
-            2px 2px 4px rgba(0,0,0,0.8)
-        ` : `
-            0 0 10px rgba(200, 200, 200, 0.6),
-            0 0 20px rgba(139, 0, 0, 0.4),
-            2px 2px 4px rgba(0,0,0,0.9)
-        `};
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     `;
     const gameTime = typeof gameStartTime !== 'undefined' ? Math.floor((Date.now() - gameStartTime) / 1000) : 0;
     stats.innerHTML = `
@@ -1006,64 +910,39 @@ function showGameOverScreen(isVictory) {
     const replayButton = document.createElement('button');
     replayButton.textContent = 'PLAY AGAIN';
     replayButton.style.cssText = `
-        padding: 20px 50px;
-        font-size: 26px;
-        font-weight: 900;
-        background: ${isVictory ? 'linear-gradient(135deg, #FF4500, #FF6347)' : 'linear-gradient(135deg, #CC0000, #990000)'};
-        color: white;
-        border: 3px solid ${isVictory ? '#FFD700' : '#FFFFFF'};
-        border-radius: 15px;
+        padding: 18px 45px;
+        font-size: 22px;
+        font-weight: 700;
+        background: ${isVictory ? 'linear-gradient(135deg, #b46040, #c47858)' : 'linear-gradient(135deg, #804040, #603030)'};
+        color: #e8e8e8;
+        border: 2px solid ${isVictory ? 'rgba(200, 140, 100, 0.6)' : 'rgba(140, 100, 100, 0.6)'};
+        border-radius: 8px;
         cursor: pointer;
-        box-shadow: ${isVictory ? `
-            0 0 20px rgba(255, 69, 0, 0.6),
-            0 8px 16px rgba(0,0,0,0.4),
-            inset 0 0 20px rgba(255, 215, 0, 0.3)
-        ` : `
-            0 8px 16px rgba(0,0,0,0.4),
-            inset 0 0 20px rgba(255,255,255,0.1)
-        `};
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         transition: all 0.3s;
         animation: slideUp 0.5s ease-out 0.5s both;
-        font-family: 'Bungee', cursive;
-        letter-spacing: 2px;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 1px;
         text-transform: uppercase;
         position: relative;
         z-index: 10;
     `;
     replayButton.onmouseover = function() {
         if (isVictory) {
-            this.style.background = 'linear-gradient(135deg, #FF6347, #FF4500)';
-            this.style.boxShadow = `
-                0 0 30px rgba(255, 69, 0, 0.8),
-                0 10px 20px rgba(0,0,0,0.5),
-                inset 0 0 30px rgba(255, 215, 0, 0.4)
-            `;
+            this.style.background = 'linear-gradient(135deg, #c47858, #b46040)';
         } else {
-            this.style.background = 'linear-gradient(135deg, #990000, #8B0000)';
-            this.style.boxShadow = `
-                0 0 25px rgba(139, 0, 0, 0.8),
-                0 10px 20px rgba(0,0,0,0.6),
-                inset 0 0 30px rgba(200, 0, 0, 0.3)
-            `;
+            this.style.background = 'linear-gradient(135deg, #603030, #804040)';
         }
-        this.style.transform = 'scale(1.08) translateY(-2px)';
+        this.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)';
+        this.style.transform = 'scale(1.05) translateY(-2px)';
     };
     replayButton.onmouseout = function() {
         if (isVictory) {
-            this.style.background = 'linear-gradient(135deg, #FF4500, #FF6347)';
-            this.style.boxShadow = `
-                0 0 20px rgba(255, 69, 0, 0.6),
-                0 8px 16px rgba(0,0,0,0.4),
-                inset 0 0 20px rgba(255, 215, 0, 0.3)
-            `;
+            this.style.background = 'linear-gradient(135deg, #b46040, #c47858)';
         } else {
-            this.style.background = 'linear-gradient(135deg, #8B0000, #990000)';
-            this.style.boxShadow = `
-                0 0 20px rgba(139, 0, 0, 0.6),
-                0 8px 16px rgba(0,0,0,0.5),
-                inset 0 0 20px rgba(200, 0, 0, 0.2)
-            `;
+            this.style.background = 'linear-gradient(135deg, #804040, #603030)';
         }
+        this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
         this.style.transform = 'scale(1) translateY(0)';
     };
     replayButton.onclick = function() {
@@ -1076,21 +955,19 @@ function showGameOverScreen(isVictory) {
     homeButton.href = 'start-page.html';
     homeButton.textContent = 'RETURN HOME';
     homeButton.style.cssText = `
-        padding: 20px 50px;
-        font-size: 26px;
-        font-weight: 900;
-        background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
-        color: white;
-        border: 3px solid #666;
-        border-radius: 15px;
+        padding: 18px 45px;
+        font-size: 22px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #505050, #303030);
+        color: #e8e8e8;
+        border: 2px solid rgba(120, 120, 120, 0.6);
+        border-radius: 8px;
         cursor: pointer;
-        box-shadow: 
-            0 8px 16px rgba(0,0,0,0.4),
-            inset 0 0 20px rgba(255,255,255,0.1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         transition: all 0.3s;
         animation: slideUp 0.5s ease-out 0.7s both;
-        font-family: 'Bungee', cursive;
-        letter-spacing: 2px;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 1px;
         text-transform: uppercase;
         position: relative;
         z-index: 10;
@@ -1098,13 +975,13 @@ function showGameOverScreen(isVictory) {
         display: inline-block;
     `;
     homeButton.onmouseover = function() {
-        this.style.background = 'linear-gradient(135deg, #5a5a5a, #3a3a3a)';
-        this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.5), inset 0 0 30px rgba(255,255,255,0.2)';
-        this.style.transform = 'scale(1.08) translateY(-2px)';
+        this.style.background = 'linear-gradient(135deg, #606060, #404040)';
+        this.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)';
+        this.style.transform = 'scale(1.05) translateY(-2px)';
     };
     homeButton.onmouseout = function() {
-        this.style.background = 'linear-gradient(135deg, #4a4a4a, #2a2a2a)';
-        this.style.boxShadow = '0 8px 16px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.1)';
+        this.style.background = 'linear-gradient(135deg, #505050, #303030)';
+        this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
         this.style.transform = 'scale(1) translateY(0)';
     };
     
@@ -1288,10 +1165,10 @@ function drawSpellCircle(ctx, landmarks, gesture, canvasWidth, canvasHeight) {
     
     ctx.save();
     
-    // Draw outer glowing circle
+    // Draw outer glowing circle - toned down
     const gradient1 = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, circleConfig.size);
-    gradient1.addColorStop(0, circleConfig.innerColor + '80');
-    gradient1.addColorStop(0.5, circleConfig.outerColor + '40');
+    gradient1.addColorStop(0, circleConfig.innerColor + '40');
+    gradient1.addColorStop(0.5, circleConfig.outerColor + '20');
     gradient1.addColorStop(1, circleConfig.outerColor + '00');
     
     ctx.fillStyle = gradient1;
@@ -1299,19 +1176,19 @@ function drawSpellCircle(ctx, landmarks, gesture, canvasWidth, canvasHeight) {
     ctx.arc(centerX, centerY, circleConfig.size, 0, Math.PI * 2);
     ctx.fill();
     
-    // Draw main circle ring
+    // Draw main circle ring - toned down
     ctx.strokeStyle = circleConfig.outerColor;
-    ctx.lineWidth = 6;
-    ctx.shadowBlur = 30;
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 12;
     ctx.shadowColor = circleConfig.outerColor;
     ctx.beginPath();
     ctx.arc(centerX, centerY, circleConfig.size * 0.6, 0, Math.PI * 2);
     ctx.stroke();
     
-    // Draw inner circle
+    // Draw inner circle - toned down
     ctx.strokeStyle = circleConfig.innerColor;
-    ctx.lineWidth = 4;
-    ctx.shadowBlur = 25;
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 10;
     ctx.shadowColor = circleConfig.innerColor;
     ctx.beginPath();
     ctx.arc(centerX, centerY, circleConfig.size * 0.4, 0, Math.PI * 2);
@@ -1322,8 +1199,8 @@ function drawSpellCircle(ctx, landmarks, gesture, canvasWidth, canvasHeight) {
     ctx.rotate(circleConfig.rotation);
     
     ctx.strokeStyle = circleConfig.runeColor;
-    ctx.lineWidth = 4;
-    ctx.shadowBlur = 20;
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 8;
     ctx.shadowColor = circleConfig.runeColor;
     
     // Draw runic symbols (simplified - triangles and lines)
@@ -1411,17 +1288,17 @@ function drawSpellCircle(ctx, landmarks, gesture, canvasWidth, canvasHeight) {
     ctx.shadowBlur = 0;
     ctx.restore();
     
-    // Draw pulsing particles
-    const particleCount = 16;
+    // Draw pulsing particles - reduced
+    const particleCount = 12;
     for (let i = 0; i < particleCount; i++) {
-        const angle = (Math.PI * 2 * i) / particleCount + time * 2;
-        const dist = circleConfig.size * 0.7 + Math.sin(time * 3 + i) * 10;
+        const angle = (Math.PI * 2 * i) / particleCount + time * 1.5;
+        const dist = circleConfig.size * 0.7 + Math.sin(time * 2 + i) * 8;
         const px = centerX + Math.cos(angle) * dist;
         const py = centerY + Math.sin(angle) * dist;
         
-        ctx.fillStyle = circleConfig.runeColor + '80';
+        ctx.fillStyle = circleConfig.runeColor + '50';
         ctx.beginPath();
-        ctx.arc(px, py, 5, 0, Math.PI * 2);
+        ctx.arc(px, py, 3, 0, Math.PI * 2);
         ctx.fill();
     }
 }
@@ -1439,7 +1316,7 @@ function showManaGainFeedback(amount, x, y) {
     manaText.style.fontSize = '28px';
     manaText.style.fontWeight = 'bold';
     manaText.style.color = '#4A9EFF';
-    manaText.style.textShadow = '0 0 10px #4A9EFF, 0 0 20px #4A9EFF, 2px 2px 4px rgba(0,0,0,0.8)';
+    manaText.style.textShadow = '0 0 6px rgba(74, 158, 255, 0.6), 0 0 12px rgba(74, 158, 255, 0.4), 1px 1px 2px rgba(0,0,0,0.8)';
     manaText.style.zIndex = '1002';
     manaText.style.pointerEvents = 'none';
     manaText.style.userSelect = 'none';
@@ -1481,7 +1358,7 @@ function showHealFeedback(amount, x, y) {
     healText.style.fontSize = '28px';
     healText.style.fontWeight = 'bold';
     healText.style.color = '#00FF88';
-    healText.style.textShadow = '0 0 10px #00FF88, 0 0 20px #00FF88, 2px 2px 4px rgba(0,0,0,0.8)';
+    healText.style.textShadow = '0 0 6px rgba(0, 255, 136, 0.6), 0 0 12px rgba(0, 255, 136, 0.4), 1px 1px 2px rgba(0,0,0,0.8)';
     healText.style.zIndex = '1002';
     healText.style.pointerEvents = 'none';
     healText.style.userSelect = 'none';
