@@ -172,7 +172,7 @@ Dynamic boss encounters:
 ## 🎥 Demo Video
 
 <!-- Add link to demo video here -->
-[Watch Demo Video]((https://www.youtube.com/watch?v=xNuD9hViZFQ))
+[Watch Demo Video]([(https://www.youtube.com/watch?v=xNuD9hViZFQ)])
 
 ## 🔮 Future Improvements
 
