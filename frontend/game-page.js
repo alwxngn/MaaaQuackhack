@@ -1,8 +1,8 @@
-// Initialize health values
+// /// Initialize health values
 let playerHealth = 100;
 let bossHealth = 100;
 let gameRunning = false;
-let comboCount = 0; // <-- FIX 2.1: Declared comboCount here
+let comboCount = 0; 
 
 // Animation variables
 let activeAnimations = [];
@@ -129,10 +129,26 @@ function startWebcam() {
         alert('Could not access webcam. Please allow camera permissions.');
     });
 }
-// ADDED THESE
-function updateEventDisplay(event) {
+
+// --- ⭐️ REPLACED THIS FUNCTION ⭐️ ---
+// Function to update the event display with challenge progress
+function updateEventDisplay(event, progress = 0, target = 0) {
     const eventDisplay = document.getElementById('event-display');
-    if (eventDisplay) {
+    if (!eventDisplay) return; // Safety check
+
+    if (event === "PUNCH_CHALLENGE") {
+        eventDisplay.textContent = `Event: PUNCH! (${progress}/${target})`;
+    } else if (event === "EXPLOSION_CHALLENGE") {
+        eventDisplay.textContent = "Event: Perform the EXPLOSION COMBO!";
+    } else if (event === "HEAL_LIGHT_CHALLENGE") {
+        eventDisplay.textContent = "Event: Perform the HEALING LIGHT COMBO!";
+    } else if (event === "WEAKFIRE") {
+        eventDisplay.textContent = "Event: Boss is weak to FIRE!";
+    } else if (event === "WEAKICE") {
+        eventDisplay.textContent = "Event: Boss is weak to ICE!";
+    } else if (event === "NONE") {
+        eventDisplay.textContent = "Event: ---";
+    } else {
         eventDisplay.textContent = `Event: ${event}`;
     }
 }
@@ -144,8 +160,8 @@ function updateCooldownDisplay(cooldown) {
         cooldownDisplay.textContent = `Cooldown: ${cooldown ? `${cooldown.toFixed(1)}s` : 'Ready'}`;
     }
 }
+// --- ⭐️ END OF REPLACED FUNCTION ⭐️ ---
 
-// ADDED THESE
 
 // Function to update player health
 function updatePlayerHealth(newHealth) {
@@ -190,29 +206,27 @@ function checkGameEnd() {
     }
 }
 
-// Fireball animation
-function playFireballAnimation() {
+// --- ⭐️ MODIFIED THIS FUNCTION ⭐️ ---
+// Fireball animation (now accepts damage)
+function playFireballAnimation(damage = 10) { // Default damage is 10
     const playerBox = document.querySelector('.player-box');
     const bossBox = document.querySelector('.boss-box');
     const boxContainer = document.querySelector('.box-container');
     const fireballFrames = ['FB001.png', 'FB002.png', 'FB003.png', 'FB004.png', 'FB005.png'];
     
-    // Get hand position or default to center of player box
-    let startX = 300; // center of 600px box
-    let startY = 350; // middle height
+    // ... (rest of function is the same: get hand position, create sprite) ...
+    let startX = 300; 
+    let startY = 350;
     
     if (lastHandPosition) {
-        // Mirror the x-coordinate since canvas is mirrored
         startX = 600 - lastHandPosition.x;
         startY = lastHandPosition.y;
     }
     
-    // Get the actual position of player box relative to container
     const playerRect = playerBox.getBoundingClientRect();
     const containerRect = boxContainer.getBoundingClientRect();
     const offsetX = playerRect.left - containerRect.left;
     
-    // Create fireball sprite element in the container (not player box)
     const fireball = document.createElement('img');
     fireball.className = 'fireball-sprite';
     fireball.src = `../assets/fireball/${fireballFrames[0]}`;
@@ -229,31 +243,33 @@ function playFireballAnimation() {
     let currentFrame = 0;
     let currentX = offsetX + startX;
     let currentSize = 100;
-    const targetX = offsetX + 600 + 300; // Travel across gap to boss box center
-    const frameInterval = 50; // ms per frame
-    const speed = 20; // pixels per frame
-    const growthRate = 3; // pixels per frame
+    const targetX = offsetX + 600 + 300;
+    const frameInterval = 50;
+    const speed = 20;
+    const growthRate = 3;
     
     const animationInterval = setInterval(() => {
-        // Update frame
+        // ... (animation/movement logic) ...
         currentFrame = (currentFrame + 1) % fireballFrames.length;
         fireball.src = `../assets/fireball/${fireballFrames[currentFrame]}`;
-        
-        // Move fireball to the right and grow
         currentX += speed;
         currentSize += growthRate;
         fireball.style.left = currentX + 'px';
         fireball.style.width = currentSize + 'px';
         fireball.style.height = currentSize + 'px';
-        
+
         // Remove when it reaches the boss box
         if (currentX > targetX) {
             clearInterval(animationInterval);
             fireball.remove();
-            playDemonHitAnimation(10); // Trigger hit animation with 10 damage
+            
+            // --- ⭐️ USE THE DAMAGE PARAMETER ⭐️ ---
+            playDemonHitAnimation(damage); // Use the damage we passed in
         }
     }, frameInterval);
 }
+// --- ⭐️ END OF MODIFIED FUNCTION ⭐️ ---
+
 
 // Demon idle animation loop
 function startDemonIdleAnimation() {
@@ -274,7 +290,7 @@ function startDemonIdleAnimation() {
             currentFrame = (currentFrame + 1) % idleFrames.length;
             demonSprite.src = `../assets/demon idle/${idleFrames[currentFrame]}`;
         }
-    }, 150); // 150ms per frame for smooth idle animation
+    }, 150);
 }
 
 // Demon take hit animation
@@ -304,32 +320,65 @@ function playDemonHitAnimation(damage = 0) {
                 updateBossHealth(bossHealth - damage);
             }
         }
-    }, 100); // 100ms per frame for hit animation
+    }, 100);
 }
 
-// ALEXES CONNECTOR TO SORCERER
+// Function to show a temporary "Challenge Complete!" message
+function showChallengeSuccessMessage() {
+    const boxContainer = document.querySelector('.box-container');
+    if (!boxContainer) return; // Safety check
 
+    // 1. Create the message element
+    const messageElement = document.createElement('div');
+    messageElement.textContent = 'CHALLENGE COMPLETE!';
+    
+    // 2. Style it so it's big, centered, and gold
+    messageElement.style.position = 'absolute';
+    messageElement.style.top = '50%';
+    messageElement.style.left = '50%';
+    messageElement.style.transform = 'translate(-50%, -50%)';
+    messageElement.style.fontSize = '48px';
+    messageElement.style.fontWeight = 'bold';
+    messageElement.style.color = '#FFD700'; // A nice gold color
+    messageElement.style.textShadow = '2px 2px 4px #000000'; // Black shadow for readability
+    messageElement.style.zIndex = '100'; // Make sure it's on top of other things
+    messageElement.style.pointerEvents = 'none'; // Lets mouse clicks go "through" it
+
+    // 3. Add it to the game area
+    boxContainer.appendChild(messageElement);
+
+    // 4. Remove it after 2.5 seconds
+    setTimeout(() => {
+        messageElement.remove();
+    }, 2500); // 2.5 seconds
+}
+
+
+// --- ⭐️ REPLACED THIS FUNCTION ⭐️ ---
+// --- ⭐️ REPLACED THIS FUNCTION ⭐️ ---
 async function gameLoop(){
     if (!gameRunning) return;
         
     let command = "NONE";
     let event = "NONE";
-
-    let cooldown = 0; // For future use
-
+    let cooldown = 0;
+    
+    // --- ⭐️ NEW variables for challenge ⭐️ ---
+    let challengeProgress = 0;
+    let challengeTarget = 0;
 
     try {
-        // my 5001 port // getting all the commands from the flask
         const response = await fetch('http://localhost:5001/get_command');
         const data = await response.json();
 
         command = data.command
-        event = data.event || "NONE"; // (FOR the qte)
-
-        cooldown = data.cooldown || 0; // (FOR the cooldown display)
-        
-        // --- FIX 2.2: Moved this line INSIDE the 'try' block ---
+        event = data.event || "NONE";
+        cooldown = data.cooldown || 0;
         comboCount = data.combo; 
+        
+        // --- ⭐️ Get challenge data from server ⭐️ ---
+        challengeProgress = data.challenge_progress || 0;
+        challengeTarget = data.challenge_target || 0;
         
     } catch (error) {
         console.error("Backend server is down!");
@@ -337,66 +386,76 @@ async function gameLoop(){
         return;
     }
 
-    // --- ADDED THIS ---
     updateCooldownDisplay(cooldown);
-    updateEventDisplay(event);
+    // --- ⭐️ Pass new data to the display function ⭐️ ---
+    updateEventDisplay(event, challengeProgress, challengeTarget);
 
-    // --- This is the "Hand-off" ---
-    // It calls Ally's functions based on your commands.
-    // This logic is 100% correct!
-    if (command === "FIREBALL") {
-        let damage = 10
-        playFireballAnimation();
-        // Damage will be applied after hit animation completes
+    // --- ⭐️ NEW COMMAND & EVENT LOGIC ⭐️ ---
+    
+    // 1. Check for the big reward first
+    if (command === "CHALLENGE_SUCCESS") {
+        console.log("CHALLENGE COMPLETE! Massive damage!");
+        
+        // --- ✨ HERE IS THE FIX ---
+        showChallengeSuccessMessage(); // <-- We call the function
+        
+        let rewardDamage = 30; // Big bonus damage!
+        playDemonHitAnimation(rewardDamage);
+    }
+    
+    // 2. Check for single spells (and apply event bonuses)
+    else if (command === "FIREBALL") {
+        let damage = 10; // Base damage
+        if (event === "WEAKFIRE") {
+            console.log("WEAK POINT HIT! Fireball is stronger!");
+            damage += 10; // Add bonus damage
+        }
+        playFireballAnimation(damage); // Pass final damage to animation
     }
 
     else if (command === "ICE_SHARD") {
-        let damage = 8
-        updateBossHealth(bossHealth - damage);
+        let damage = 8; // Base damage
+        if (event === "WEAKICE") {
+            console.log("WEAK POINT HIT! Ice Shard is stronger!");
+            damage += 10; // Add bonus damage
+        }
+        playDemonHitAnimation(damage); // Use hit animation directly
     }
 
     else if (command === "HEAL") {
         let hp = 12
         updatePlayerHealth(playerHealth + hp);
-        
     }
 
+    // 3. Check for regular combos (these are their *normal* effects)
     else if (command === "EXPLOSION_COMBO") {
-        let damage = 20
-        updateBossHealth(bossHealth - damage);
+        let damage = 20; // Normal combo damage
+        playDemonHitAnimation(damage);
     }
 
     else if (command === "HEALING_LIGHT_COMBO") {
-        let damage = 12
-        let hp = 5
-        updateBossHealth(bossHealth - damage);
+        let damage = 12;
+        let hp = 5;
+        playDemonHitAnimation(damage);
         updatePlayerHealth(playerHealth + hp);
     }
+    
+    else if (command === "PUNCH_COMBO") {
+        let damage = 5; // Normal punch damage
+        playDemonHitAnimation(damage);
+    }
+    
+    // (We don't need to check for COOLDOWN or NONE)
 
+    // Boss's random attack (unchanged)
     if (Math.random() < 0.01) { 
-        let bossDamage = 15; // The boss hits for 15 damage
+        let bossDamage = 15;
         console.log('Boss attacks for', bossDamage, 'damage!');
-        
-        // --- HERE IT IS! ---
-        // We call Ally's function to hurt the player!
         updatePlayerHealth(playerHealth - bossDamage);
     }
     
-    // --- FIX 1: Changed 'data.event' to 'event' ---
-    if (event !== "NONE") {
-        console.log(`EVENT: Server wants us to do ${event}!`);
-        // TODO: Show this on the UI
-        
-        // --- FIX 1.2: Also fixed it here ---
-        if (event === "WEAKFIRE" && command === "FIREBALL") {
-            console.log("WEAK POINT HIT! +10 DAMAGE!");
-            updateBossHealth(bossHealth - 10);
-        }
-    }
-    
-    // (The line `comboCount = data.combo;` was here, but we moved it up)
+    // (The old, separate event-checking block is gone, as it's
+    // now handled inside the command logic above)
     
     requestAnimationFrame(gameLoop);
-}
-
-// (We can delete the old DOMContentLoaded listener, as we have a new one)
+}ask;

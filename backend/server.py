@@ -22,6 +22,27 @@ combo_counter = 0
 ATTACK_COOLDOWN = 1  # seconds
 last_attack_time = 0
 
+# event logic
+
+current_event = "NONE"
+event_start_time = 0
+EVENT_DURATION = 7  # seconds
+EVENT_COOLDOWN = 10  # seconds
+last_event_end_time = 0
+
+# possible events
+POSSIBLE_EVENTS = ["WEAKFIRE", "WEAKICE",
+    "EXPLOSION_CHALLENGE", "HEAL_LIGHT_CHALLENGE"]
+
+# State for tracking challenge progress
+challenge_progress = 0
+challenge_target = 0
+challenge_gesture = "NONE"
+
+
+
+
+
 
 @app.route('/get_command')
 def get_command():
@@ -36,19 +57,14 @@ def get_command():
     # --- 3. Still SPELL LOGIC GOES HERE ---
     
     # --- FIX 2: Matched your spell names to Alan's gestures ---
-    global last_gesture
-    global combo_counter
-    global last_attack_time
+    global last_gesture, combo_counter, last_attack_time
+    global current_event, event_start_time, last_event_end_time
+    global challenge_progress, challenge_target, challenge_gesture  
     command = "NONE"
     # combos!!
 
 
 
-    # if current_gesture != "NONE" and current_gesture != last_gesture:
-        
-        # --- All your spell/combo logic now goes INSIDE this "if" ---
-        
-        # combos!!
 
     # --- 1. "ANTI-SPAM" CHECK ---
     # Is this a *new* gesture? (Not "NONE" and not the same as last frame)
@@ -71,7 +87,7 @@ def get_command():
                 combo_counter += 2
                 
                 # Single spells
-            elif current_gesture == "FIST":
+            if current_gesture == "FIST":
                 command = "FIREBALL"
                 combo_counter += 1
 
@@ -98,6 +114,52 @@ def get_command():
             command = "COOLDOWN"
 
 
+    current_time = time.time()
+
+    # 1. Check if an active event is running
+    if current_event != "NONE":
+        # Check for event expiration
+        if (current_time - event_start_time) > EVENT_DURATION:
+            print(f"Event {current_event} has EXPIRED.")
+            current_event = "NONE"
+            last_event_end_time = current_time
+            # Reset challenge state on failure
+            challenge_progress = 0
+            challenge_target = 0
+            challenge_gesture = "NONE"
+        
+      
+
+        # --- COMBO_CHALLENGE checks ---
+        elif current_event == "EXPLOSION_CHALLENGE":
+            # Check if the *command* (calculated above) is the one we want
+            if command == "EXPLOSION_COMBO":
+                print("COMBO CHALLENGE COMPLETE!")
+                command = "CHALLENGE_SUCCESS" # Overwrite/upgrade the command!
+                # Reset event state
+                current_event = "NONE"
+                last_event_end_time = current_time
+        
+        elif current_event == "HEAL_LIGHT_CHALLENGE":
+            if command == "HEALING_LIGHT_COMBO":
+                print("COMBO CHALLENGE COMPLETE!")
+                command = "CHALLENGE_SUCCESS" # Overwrite/upgrade the command!
+                # Reset event state
+                current_event = "NONE"
+                last_event_end_time = current_time
+
+    # 2. Else, check if the "calm" period is over and start a new event
+    elif (current_time - last_event_end_time) > EVENT_COOLDOWN:
+        current_event = random.choice(POSSIBLE_EVENTS)
+        event_start_time = current_time
+        print(f"Event {current_event} has STARTED!")
+        
+   
+        challenge_progress = 0
+        challenge_target = 0
+        challenge_gesture = "NONE"
+
+
     # --- 4. THE "RESET" FIX ---
     #
     # We update the last_gesture AT THE END, outside the "if" block.
@@ -107,8 +169,7 @@ def get_command():
     #
     last_gesture = current_gesture
 
-    event_list = ["WEAKFIRE", "WEAKICE", "NONE", "NONE","NONE","NONE","NONE","NONE","NONE","NONE"]
-    current_event = random.choice(event_list)
+  
 
 
 
@@ -120,8 +181,13 @@ def get_command():
     return jsonify({"command": command, 
                     "event": current_event, 
                     "combo": combo_counter, 
-                    "gesture": current_gesture
-                    , "cooldown": cooldown_time
+                    "gesture": current_gesture,
+                    "cooldown": cooldown_time,
+
+                    "challenge_progress": challenge_progress,
+                    "challenge_target": challenge_target   
+
+
                     })
 
 
