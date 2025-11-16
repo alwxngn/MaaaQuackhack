@@ -4,13 +4,24 @@ const MAX_PLAYER_HEALTH = 250;
 let bossHealth = 100;
 const MAX_BOSS_HEALTH = 300;
 let gameRunning = false;
-let comboCount = 0; 
+let comboCount = 0;
+
+// Mana system
+let currentMana = 100;
+let maxMana = 100;
+let manaBalls = []; // Array to track active mana balls
+let lastManaBallSpawn = 0;
+const MANA_BALL_SPAWN_INTERVAL = 8000; // Spawn every 8 seconds 
 
 // Animation variables
 let activeAnimations = [];
 let lastHandPosition = null;
-let demonAnimationState = 'idle'; // 'idle' or 'hit'
+let demonAnimationState = 'idle'; // 'idle', 'hit', or 'cleave'
 let demonIdleInterval = null;
+let demonHitInterval = null; // Track hit animation interval
+let demonCleaveInterval = null; // Track cleave animation interval
+let lastBossAttackCheck = 0; // Track last boss attack check time
+const BOSS_ATTACK_CHECK_INTERVAL = 500; // Check every 500ms instead of every frame
 
 // Wait for page to load
 document.addEventListener('DOMContentLoaded', function() {
@@ -259,10 +270,97 @@ function updateBossHealth(newHealth) {
     checkGameEnd();
 }
 
+// Function to update mana
+function updateMana(newMana, newMaxMana) {
+    currentMana = Math.max(0, Math.min(newMaxMana, newMana));
+    maxMana = newMaxMana;
+    const manaBar = document.getElementById('mana-fill');
+    
+    if (manaBar) {
+        const manaPercentage = (currentMana / maxMana) * 100;
+        manaBar.style.width = manaPercentage + '%';
+    }
+}
+
+// Spawn a mana ball
+function spawnManaBall() {
+    const boxContainer = document.querySelector('.box-container');
+    if (!boxContainer) return;
+    
+    const containerRect = boxContainer.getBoundingClientRect();
+    // Spawn at random Y position, X position in middle-right area
+    const x = containerRect.width * 0.6 + Math.random() * containerRect.width * 0.3;
+    const y = 100 + Math.random() * (containerRect.height - 200);
+    
+    const manaBall = document.createElement('div');
+    manaBall.className = 'mana-ball';
+    manaBall.style.left = x + 'px';
+    manaBall.style.top = y + 'px';
+    manaBall.id = 'mana-ball-' + Date.now();
+    
+    boxContainer.appendChild(manaBall);
+    
+    const ballData = {
+        element: manaBall,
+        x: x,
+        y: y,
+        width: 40,
+        height: 40,
+        id: manaBall.id
+    };
+    
+    manaBalls.push(ballData);
+    
+    // Remove after 10 seconds if not collected
+    setTimeout(() => {
+        const index = manaBalls.findIndex(b => b.id === ballData.id);
+        if (index !== -1) {
+            manaBalls.splice(index, 1);
+            manaBall.remove();
+        }
+    }, 10000);
+}
+
+// Check collision between projectile and mana balls
+function checkManaBallCollision(projectileX, projectileY, projectileSize) {
+    for (let i = manaBalls.length - 1; i >= 0; i--) {
+        const ball = manaBalls[i];
+        const ballCenterX = ball.x + 20;
+        const ballCenterY = ball.y + 20;
+        
+        // Simple circle collision detection
+        const distance = Math.sqrt(
+            Math.pow(projectileX - ballCenterX, 2) + 
+            Math.pow(projectileY - ballCenterY, 2)
+        );
+        
+        if (distance < (projectileSize / 2 + 20)) {
+            // Hit! Remove ball and add mana
+            ball.element.remove();
+            manaBalls.splice(i, 1);
+            
+            // Add mana via backend
+            fetch('http://localhost:5001/add_mana', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({amount: 20})
+            }).catch(err => console.error('Error adding mana:', err));
+            
+            return true;
+        }
+    }
+    return false;
+}
+
 function resetHealth() {
     updatePlayerHealth(MAX_PLAYER_HEALTH);
     updateBossHealth(MAX_BOSS_HEALTH);
-    console.log('Health reset!');
+    updateMana(100, 100);
+    // Clear all mana balls
+    manaBalls.forEach(ball => ball.element.remove());
+    manaBalls = [];
+    lastManaBallSpawn = Date.now();
+    console.log('Health and mana reset!');
     
 }
 
@@ -386,6 +484,12 @@ function playFireballAnimation(damage = 10) { // Default damage is 10
         fireball.style.left = currentX + 'px';
         fireball.style.width = currentSize + 'px';
         fireball.style.height = currentSize + 'px';
+        
+        // Check for mana ball collision
+        const fireballCenterY = startY;
+        if (checkManaBallCollision(currentX, fireballCenterY, currentSize)) {
+            // Hit a mana ball, continue flying but don't damage boss
+        }
 
         // Remove when it reaches the boss box
         if (currentX > targetX) {
@@ -461,6 +565,11 @@ function playIceShardAnimation() {
         iceShard.style.left = currentX + 'px';
         iceShard.style.width = currentSize + 'px';
         iceShard.style.height = currentSize + 'px';
+        
+        // Check for mana ball collision
+        if (checkManaBallCollision(currentX, startY, currentSize)) {
+            // Hit a mana ball, continue flying but don't damage boss
+        }
         
         // Remove when it reaches the boss box
         if (currentX > targetX) {
@@ -546,6 +655,24 @@ function startDemonIdleAnimation() {
 
 // Demon take hit animation
 function playDemonHitAnimation(damage = 0) {
+    // Don't interrupt cleave animation - it's more important
+    if (demonAnimationState === 'cleave') {
+        // Reduce damage when demon is attacking (50% damage reduction)
+        const reducedDamage = Math.floor(damage * 0.5);
+        // Queue the damage to apply after cleave finishes
+        setTimeout(() => {
+            if (reducedDamage > 0) {
+                updateBossHealth(bossHealth - reducedDamage);
+            }
+        }, 1200); // Wait for cleave to finish (15 frames * 80ms = 1200ms)
+        return;
+    }
+    
+    // Clear any existing hit animation
+    if (demonHitInterval) {
+        clearInterval(demonHitInterval);
+    }
+    
     const demonSprite = document.getElementById('demon-sprite');
     const hitFrames = [
         'demon_take_hit_1.png',
@@ -558,12 +685,13 @@ function playDemonHitAnimation(damage = 0) {
     demonAnimationState = 'hit';
     let currentFrame = 0;
     
-    const hitInterval = setInterval(() => {
+    demonHitInterval = setInterval(() => {
         if (currentFrame < hitFrames.length) {
             demonSprite.src = `../assets/demon_take_hit/${hitFrames[currentFrame]}`;
             currentFrame++;
         } else {
-            clearInterval(hitInterval);
+            clearInterval(demonHitInterval);
+            demonHitInterval = null;
             demonAnimationState = 'idle'; // Return to idle
             
             // Apply damage after hit animation completes
@@ -572,6 +700,58 @@ function playDemonHitAnimation(damage = 0) {
             }
         }
     }, 100);
+}
+
+// Demon cleave attack animation
+function playDemonCleaveAnimation(damage = 0) {
+    // Don't start if already cleaving
+    if (demonAnimationState === 'cleave') {
+        return;
+    }
+    
+    // Clear any existing hit animation - cleave has priority
+    if (demonHitInterval) {
+        clearInterval(demonHitInterval);
+        demonHitInterval = null;
+    }
+    
+    const demonSprite = document.getElementById('demon-sprite');
+    const cleaveFrames = [
+        'demon_cleave_1.png',
+        'demon_cleave_2.png',
+        'demon_cleave_3.png',
+        'demon_cleave_4.png',
+        'demon_cleave_5.png',
+        'demon_cleave_6.png',
+        'demon_cleave_7.png',
+        'demon_cleave_8.png',
+        'demon_cleave_9.png',
+        'demon_cleave_10.png',
+        'demon_cleave_11.png',
+        'demon_cleave_12.png',
+        'demon_cleave_13.png',
+        'demon_cleave_14.png',
+        'demon_cleave_15.png'
+    ];
+    
+    demonAnimationState = 'cleave';
+    let currentFrame = 0;
+    
+    demonCleaveInterval = setInterval(() => {
+        if (currentFrame < cleaveFrames.length) {
+            demonSprite.src = `../assets/demon_cleave/${cleaveFrames[currentFrame]}`;
+            currentFrame++;
+        } else {
+            clearInterval(demonCleaveInterval);
+            demonCleaveInterval = null;
+            demonAnimationState = 'idle'; // Return to idle
+            
+            // Apply damage after cleave animation completes
+            if (damage > 0) {
+                updatePlayerHealth(playerHealth - damage);
+            }
+        }
+    }, 80); // Slightly faster than hit animation for more dramatic effect
 }
 
 // Function to show a temporary "Challenge Complete!" message
@@ -625,7 +805,12 @@ async function gameLoop(){
         command = data.command
         event = data.event || "NONE";
         cooldown = data.cooldown || 0;
-        comboCount = data.combo; 
+        comboCount = data.combo;
+        
+        // Update mana from backend
+        if (data.mana !== undefined && data.max_mana !== undefined) {
+            updateMana(data.mana, data.max_mana);
+        }
         
         // Debug logging - MORE DETAILED (moved inside try block where data is available)
         console.log("Server response - Command:", command, "Gesture:", data.gesture, "Event:", event);
@@ -639,11 +824,24 @@ async function gameLoop(){
     updateCooldownDisplay(cooldown);
     // --- ⭐️ Pass new data to the display function ⭐️ ---
     updateEventDisplay(event, challengeProgress, challengeTarget);
+    
+    // Spawn mana balls periodically
+    const now = Date.now();
+    if (now - lastManaBallSpawn >= MANA_BALL_SPAWN_INTERVAL) {
+        spawnManaBall();
+        lastManaBallSpawn = now;
+    }
 
     // --- ⭐️ NEW COMMAND & EVENT LOGIC ⭐️ ---
     
+    // 0. Check for insufficient mana
+    if (command === "INSUFFICIENT_MANA") {
+        console.log("Not enough mana!");
+        // Could show a message here if desired
+    }
+    
     // 1. Check for the big reward first
-    if (command === "CHALLENGE_SUCCESS") {
+    else if (command === "CHALLENGE_SUCCESS") {
         console.log("CHALLENGE COMPLETE! Massive damage!");
         
         // --- ✨ HERE IS THE FIX ---
@@ -695,15 +893,21 @@ async function gameLoop(){
     //     updatePlayerHealth(playerHealth + hp);
     // }
 
-    // Boss's random attack (unchanged)
-    if (Math.random() < 0.01) { 
-        let bossDamage = 15;
-        console.log('Boss attacks for', bossDamage, 'damage!');
-        updatePlayerHealth(playerHealth - bossDamage);
+    // Boss's random attack with delay to reduce lag
+    const currentTime = Date.now();
+    if (currentTime - lastBossAttackCheck >= BOSS_ATTACK_CHECK_INTERVAL) {
+        lastBossAttackCheck = currentTime;
+        
+        // Check for attack (0.01 chance per check, but we check less frequently now)
+        if (Math.random() < 0.05) { // Increased chance since we check less often
+            let bossDamage = 15;
+            console.log('Boss attacks for', bossDamage, 'damage!');
+            playDemonCleaveAnimation(bossDamage); // Play cleave animation, damage applied after animation
+        }
     }
     
     // (The old, separate event-checking block is gone, as it's
     // now handled inside the command logic above)
     
     requestAnimationFrame(gameLoop);
-}ask;
+}
