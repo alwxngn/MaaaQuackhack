@@ -386,7 +386,7 @@ function showCountdownScreen() {
         line-height: 1.8;
         font-family: 'Press Start 2P', cursive;
     `;
-    tipText.textContent = 'TIP: PICK UP MANA AND HEALTH ORBS BY CONNECTING YOUR SPELLS TO THEM! THIS BOSS WILL HAVE THREE STAGES';
+    tipText.textContent = 'TIP: COMBINE DIFFERENT SPELLS TO CREATE COMBOS!';
     
     countdownContent.appendChild(countdownNumber);
     countdownContent.appendChild(tipText);
