@@ -13,9 +13,9 @@ let lastHandPosition = null;
 
 // Sound effects system
 const sounds = {
-    fireball: new Audio('../assets/sounds/fireball.mp3'),
-    iceShard: new Audio('../assets/sounds/ice_shard.wav'),
-    thunder: new Audio('../assets/sounds/thunder.wav')
+    fireball: new Audio('../../assets/sounds/fireball.mp3'),
+    iceShard: new Audio('../../assets/sounds/ice_shard.wav'),
+    thunder: new Audio('../../assets/sounds/thunder.wav')
 };
 
 Object.values(sounds).forEach(sound => {
@@ -227,7 +227,7 @@ function playTutorialFireball() {
     
     const fireball = document.createElement('img');
     fireball.className = 'fireball-sprite';
-    fireball.src = `../assets/fireball/${fireballFrames[0]}`;
+    fireball.src = `../../assets/fireball/${fireballFrames[0]}`;
     fireball.style.position = 'absolute';
     fireball.style.left = startX + 'px';
     fireball.style.top = startY + 'px';
@@ -245,7 +245,7 @@ function playTutorialFireball() {
     
     const animationInterval = setInterval(() => {
         currentFrame = (currentFrame + 1) % fireballFrames.length;
-        fireball.src = `../assets/fireball/${fireballFrames[currentFrame]}`;
+        fireball.src = `../../assets/fireball/${fireballFrames[currentFrame]}`;
         currentX += 30;
         currentSize += 3;
         fireball.style.left = currentX + 'px';
@@ -283,7 +283,7 @@ function playTutorialIceShard() {
     
     const iceShard = document.createElement('img');
     iceShard.className = 'ice-shard-sprite';
-    iceShard.src = `../assets/ice shards/${iceShardFrames[0]}`;
+    iceShard.src = `../../assets/ice shards/${iceShardFrames[0]}`;
     iceShard.style.position = 'absolute';
     iceShard.style.left = startX + 'px';
     iceShard.style.top = startY + 'px';
@@ -301,7 +301,7 @@ function playTutorialIceShard() {
     
     const animationInterval = setInterval(() => {
         currentFrame = (currentFrame + 1) % iceShardFrames.length;
-        iceShard.src = `../assets/ice shards/${iceShardFrames[currentFrame]}`;
+        iceShard.src = `../../assets/ice shards/${iceShardFrames[currentFrame]}`;
         currentX += 32;
         currentSize += 2.5;
         iceShard.style.left = currentX + 'px';
@@ -426,7 +426,7 @@ function playTutorialLightning() {
     
     const lightning = document.createElement('img');
     lightning.className = 'lightning-sprite';
-    lightning.src = `../assets/lighting/${lightningFrames[0]}`;
+    lightning.src = `../../assets/lighting/${lightningFrames[0]}`;
     lightning.style.position = 'absolute';
     lightning.style.left = '50%';
     lightning.style.top = '0';
@@ -444,7 +444,7 @@ function playTutorialLightning() {
     
     const animationInterval = setInterval(() => {
         currentFrame = (currentFrame + 1) % lightningFrames.length;
-        lightning.src = `../assets/lighting/${lightningFrames[currentFrame]}`;
+        lightning.src = `../../assets/lighting/${lightningFrames[currentFrame]}`;
         
         if (currentFrame === 0) {
             flashCount++;

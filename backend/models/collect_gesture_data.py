@@ -41,7 +41,11 @@ class GestureDataCollector:
             'PUNCH': 0
         }
         
-        self.data_file = 'gesture_training_data.csv'
+        # Get directory of this script and set data file path
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        backend_dir = os.path.dirname(script_dir)
+        data_dir = os.path.join(backend_dir, 'data')
+        self.data_file = os.path.join(data_dir, 'gesture_training_data.csv')
         self.init_csv()
         
     def init_csv(self):
