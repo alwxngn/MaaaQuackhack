@@ -8,9 +8,9 @@ body{
     margin-top: 50px;
     overflow: hidden;
     background-image: url("../assets/Cave.png");
-    background-size: 120%;
+    background-size: 105%;
     background-repeat: no-repeat;
-    background-position: 50% 0%;
+    background-position: 50% -10%;
     color: white;
 }
 
@@ -24,8 +24,8 @@ body{
 .box-container{
     display: flex;
     gap: 50px;
-    justify-content: center;
     margin-top: 10px;
+    position: relative;
 }
 
 .player-hp-section, .boss-hp-section {
@@ -52,18 +52,21 @@ body{
     top: 0;
     left: 0;
 }
-.boss-box{
+/* .boss-box{
     height: 700px;
     width: 600px;
-    border: 3px solid white;
-}
+   border: 3px solid white;
+    position: relative;
+    overflow: hidden;
+} */
 
 .player-box{
     height: 700px;
     width: 600px;
-    border: 3px solid white;
+    /* border: 3px solid white; */
     position: relative;
     overflow: hidden;
+    margin: 20px;
 }
 
 #webcam {
@@ -76,5 +79,22 @@ body{
     width: 100%;
     height: 100%;
     transform: scaleX(-1); /* Mirror the canvas */
+}
+
+/* Animation sprites */
+.fireball-sprite {
+    image-rendering: pixelated; /* Keep pixel art crisp */
+    pointer-events: none; /* Don't block clicks */
+    width: 200px;
+    height: 100px;
+}
+
+#demon-sprite {
+    width: 2200px;
+    height: 1200px;
+    image-rendering: pixelated;
+    position: absolute;
+    bottom: 40px;
+    right: -600px;
 }
 

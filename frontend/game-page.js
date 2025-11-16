@@ -4,11 +4,16 @@ let bossHealth = 100;
 let gameRunning = false;
 let comboCount = 0; // <-- FIX 2.1: Declared comboCount here
 
+// Animation variables
+let activeAnimations = [];
+let lastHandPosition = null;
+
 // Wait for page to load
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Game loaded!");
     resetHealth();
     startWebcam(); // <-- Start the webcam
+    startDemonIdleAnimation(); // <-- Start demon idle animation
     gameRunning = true; // <-- START THE GAME!
     gameLoop();         // <-- START THE LOOP!
 });
@@ -43,13 +48,20 @@ function startWebcam() {
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
         canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
-        // Draw hand landmarks
+        // Draw hand landmarks and track hand position
         if (results.multiHandLandmarks) {
             for (const landmarks of results.multiHandLandmarks) {
                 drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, 
                     {color: '#00FF00', lineWidth: 3});
                 drawLandmarks(canvasCtx, landmarks, 
                     {color: '#FF0000', lineWidth: 1, radius: 3});
+                
+                // Store the wrist position (landmark 0) for fireball origin
+                const wrist = landmarks[0];
+                lastHandPosition = {
+                    x: wrist.x * canvasElement.width,
+                    y: wrist.y * canvasElement.height
+                };
             }
         }
         canvasCtx.restore();
@@ -132,6 +144,90 @@ function checkGameEnd() {
     }
 }
 
+// Fireball animation
+function playFireballAnimation() {
+    const playerBox = document.querySelector('.player-box');
+    const bossBox = document.querySelector('.boss-box');
+    const boxContainer = document.querySelector('.box-container');
+    const fireballFrames = ['FB001.png', 'FB002.png', 'FB003.png', 'FB004.png', 'FB005.png'];
+    
+    // Get hand position or default to center of player box
+    let startX = 300; // center of 600px box
+    let startY = 350; // middle height
+    
+    if (lastHandPosition) {
+        // Mirror the x-coordinate since canvas is mirrored
+        startX = 600 - lastHandPosition.x;
+        startY = lastHandPosition.y;
+    }
+    
+    // Get the actual position of player box relative to container
+    const playerRect = playerBox.getBoundingClientRect();
+    const containerRect = boxContainer.getBoundingClientRect();
+    const offsetX = playerRect.left - containerRect.left;
+    
+    // Create fireball sprite element in the container (not player box)
+    const fireball = document.createElement('img');
+    fireball.className = 'fireball-sprite';
+    fireball.src = `../assets/fireball/${fireballFrames[0]}`;
+    fireball.style.position = 'absolute';
+    fireball.style.left = (offsetX + startX) + 'px';
+    fireball.style.top = startY + 'px';
+    fireball.style.width = '100px';
+    fireball.style.height = '100px';
+    fireball.style.transform = 'translate(-50%, -50%)';
+    fireball.style.zIndex = '10';
+    
+    boxContainer.appendChild(fireball);
+    
+    let currentFrame = 0;
+    let currentX = offsetX + startX;
+    let currentSize = 100;
+    const targetX = offsetX + 600 + 300; // Travel across gap to boss box center
+    const frameInterval = 50; // ms per frame
+    const speed = 20; // pixels per frame
+    const growthRate = 3; // pixels per frame
+    
+    const animationInterval = setInterval(() => {
+        // Update frame
+        currentFrame = (currentFrame + 1) % fireballFrames.length;
+        fireball.src = `../assets/fireball/${fireballFrames[currentFrame]}`;
+        
+        // Move fireball to the right and grow
+        currentX += speed;
+        currentSize += growthRate;
+        fireball.style.left = currentX + 'px';
+        fireball.style.width = currentSize + 'px';
+        fireball.style.height = currentSize + 'px';
+        
+        // Remove when it reaches the boss box
+        if (currentX > targetX) {
+            clearInterval(animationInterval);
+            fireball.remove();
+        }
+    }, frameInterval);
+}
+
+// Demon idle animation loop
+function startDemonIdleAnimation() {
+    const demonSprite = document.getElementById('demon-sprite');
+    const idleFrames = [
+        'demon_idle_1.png',
+        'demon_idle_2.png',
+        'demon_idle_3.png',
+        'demon_idle_4.png',
+        'demon_idle_5.png',
+        'demon_idle_6.png'
+    ];
+    
+    let currentFrame = 0;
+    
+    setInterval(() => {
+        currentFrame = (currentFrame + 1) % idleFrames.length;
+        demonSprite.src = `../assets/demon idle/${idleFrames[currentFrame]}`;
+    }, 150); // 150ms per frame for smooth idle animation
+}
+
 // ALEXES CONNECTOR TO SORCERER
 
 async function gameLoop(){
@@ -171,6 +267,7 @@ async function gameLoop(){
     // This logic is 100% correct!
     if (command === "FIREBALL") {
         let damage = 10
+        playFireballAnimation();
         updateBossHealth(bossHealth - damage);
     }
 
