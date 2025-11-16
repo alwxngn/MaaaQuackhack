@@ -1,8 +1,8 @@
 // Initialize health values
 let playerHealth = 250;
 const MAX_PLAYER_HEALTH = 250;
-let bossHealth = 100;
-const MAX_BOSS_HEALTH = 300;
+let bossHealth = 200;
+const MAX_BOSS_HEALTH = 200;
 let gameRunning = false;
 let comboCount = 0;
 
@@ -27,7 +27,7 @@ let currentMana = 100;
 let maxMana = 100;
 let manaBalls = []; // Array to track active mana balls
 let lastManaBallSpawn = 0;
-const MANA_BALL_SPAWN_INTERVAL = 8000; // Spawn every 8 seconds 
+const MANA_BALL_SPAWN_INTERVAL = 4000; // Spawn every 4 seconds (faster regen) 
 
 // Animation variables
 let activeAnimations = [];
@@ -37,7 +37,7 @@ let demonIdleInterval = null;
 let demonHitInterval = null; // Track hit animation interval
 let demonCleaveInterval = null; // Track cleave animation interval
 let lastBossAttackCheck = 0; // Track last boss attack check time
-const BOSS_ATTACK_CHECK_INTERVAL = 500; // Check every 500ms instead of every frame
+const BOSS_ATTACK_CHECK_INTERVAL = 300; // Check every 300ms for more frequent attacks
 
 // Game start time tracking
 let gameStartTime = Date.now();
@@ -201,7 +201,10 @@ function startWebcam() {
 
         // Draw hand landmarks and track hand position
         if (results.multiHandLandmarks) {
-            for (const landmarks of results.multiHandLandmarks) {
+            // Process BOTH hands independently for dual casting
+            for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+                const landmarks = results.multiHandLandmarks[i];
+                
                 drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, 
                     {color: '#00FF00', lineWidth: 3});
                 drawLandmarks(canvasCtx, landmarks, 
@@ -214,7 +217,7 @@ function startWebcam() {
                     y: wrist.y * canvasElement.height
                 };
                 
-                // Detect gesture from hand landmarks
+                // Detect and send gesture for EACH hand independently
                 const gesture = detectGesture(landmarks);
                 sendGestureToBackend(gesture);
             }
@@ -900,8 +903,8 @@ function playFireballAnimation(damage = 10) { // Default damage is 10
     let currentX = offsetX + startX;
     let currentSize = 100;
     const targetX = offsetX + 600 + 300;
-    const frameInterval = 50;
-    const speed = 20;
+    const frameInterval = 30; // Faster: 50 -> 30ms
+    const speed = 30; // Faster: 20 -> 30 pixels per frame
     const growthRate = 3;
     
     const animationInterval = setInterval(() => {
@@ -985,8 +988,8 @@ function playIceShardAnimation() {
     let currentSize = 120;
     const containerRect = boxContainer.getBoundingClientRect();
     const targetX = containerRect.width - 300; // Boss box center
-    const frameInterval = 50; // ms per frame
-    const speed = 22; // pixels per frame (slightly faster than fireball)
+    const frameInterval = 30; // Faster: 50 -> 30ms
+    const speed = 32; // Faster: 22 -> 32 pixels per frame
     const growthRate = 2.5; // pixels per frame
     
     const animationInterval = setInterval(() => {
@@ -1051,7 +1054,7 @@ function playLightningAnimation() {
     let currentFrame = 0;
     let flashCount = 0;
     const maxFlashes = 3;
-    const frameInterval = 60; // ms per frame
+    const frameInterval = 40; // Faster: 60 -> 40ms per frame
     
     const animationInterval = setInterval(() => {
         // Update frame
@@ -1381,10 +1384,11 @@ async function gameLoop(){
     if (currentTime - lastBossAttackCheck >= BOSS_ATTACK_CHECK_INTERVAL) {
         lastBossAttackCheck = currentTime;
         
-        // Check for attack (0.01 chance per check, but we check less frequently now)
-        if (Math.random() < 0.05) { // Increased chance since we check less often
-            let bossDamage = 15;
-            console.log('Boss attacks for', bossDamage, 'damage!');
+        // Randomized boss attack - even more frequent with varied damage
+        if (Math.random() < 0.18) { // 18% chance every 300ms (increased from 12%)
+            // Randomize damage between 8-25 (wider range)
+            let bossDamage = Math.floor(Math.random() * 18) + 8; // Random between 8-25
+            console.log('Boss cleaves for', bossDamage, 'damage!');
             playDemonCleaveAnimation(bossDamage); // Play cleave animation, damage applied after animation
         }
     }

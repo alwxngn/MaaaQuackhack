@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="game-page.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Bungee&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
@@ -10,29 +13,26 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
-    <title>Game page</title>
+    <title>ComboCraft - Battle</title>
 </head>
 <body>
-    <!-- <h1>Game Page</h1> -->
-    <!-- me put event and CD info -->
-    <div id="event-display" class="event-message">NONE</div>
-    <div id="cooldown-display" class="info-display">Cooldown: Ready</div>
+    <div id="event-display" class="event-message">READY</div>
     
     <div class="hp-container">
         <div class="player-hp-section">
-            <span>Player HP</span>
+            <div class="hp-label">PLAYER</div>
             <div class="player-hp-wrapper">
                 <div id="player-hp" class="hp-bar"></div>
                 <div id="player-hp-fill" class="hp-bar-fill"></div>
             </div>
-            <span style="margin-top: 10px; display: block;">Mana</span>
+            <div class="mana-label">MANA</div>
             <div class="mana-wrapper">
                 <div id="mana-bar" class="mana-bar"></div>
                 <div id="mana-fill" class="mana-bar-fill"></div>
             </div>
         </div>
         <div class="boss-hp-section">
-            <span>Boss HP</span>
+            <div class="hp-label">DEMON BOSS</div>
             <div class="boss-hp-wrapper">
                 <div id="boss-hp" class="hp-bar"></div>
                 <div id="boss-hp-fill" class="hp-bar-fill"></div>

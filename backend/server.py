@@ -27,7 +27,7 @@ last_attack_time = 0
 MAX_MANA = 100
 current_mana = 100
 last_mana_regen_time = time.time()
-MANA_REGEN_RATE = 5  # mana per second when not attacking
+MANA_REGEN_RATE = 12  # mana per second when not attacking
 MANA_COSTS = {
     "FIREBALL": 20,
     "ICE_SHARD": 15,
@@ -73,7 +73,7 @@ def add_mana():
     """Add mana when player hits a mana ball"""
     global current_mana
     data = request.json
-    mana_amount = data.get('amount', 20)
+    mana_amount = data.get('amount', 30)  # Increased from 20 to 30
     current_mana = min(MAX_MANA, current_mana + mana_amount)
     return jsonify({'status': 'ok', 'mana': current_mana})
 
