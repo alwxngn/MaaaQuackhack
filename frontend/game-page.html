@@ -25,18 +25,7 @@
         </div>
     </div>
     
-    <!-- TEST CONTROLS - Remove when backend is ready -->
-    <div class="test-controls" style="position: fixed; bottom: 20px; left: 20px; background: rgba(0,0,0,0.8); color: white; padding: 15px; border-radius: 10px;">
-        <h3>Test Controls</h3>
-        <button onclick="simulatePlayerAttack()">Player Attacks Boss</button>
-        <button onclick="simulateBossAttack()">Boss Attacks Player</button>
-        <button onclick="resetHealth()">Reset Health</button>
-        <button onclick="simulateGameLoop()">Auto Battle</button>
-        <br><br>
-        <label>Player HP: <input type="range" id="playerSlider" min="0" max="100" value="100" onchange="updatePlayerHealth(this.value)"></label>
-        <br>
-        <label>Boss HP: <input type="range" id="bossSlider" min="0" max="100" value="100" onchange="updateBossHealth(this.value)"></label>
-    </div>
+  
     
     <div class="box-container">
         <div class="player-box">
