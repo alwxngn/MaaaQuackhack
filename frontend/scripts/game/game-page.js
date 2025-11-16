@@ -12,6 +12,7 @@ let comboJustReset = false; // Flag to prevent backend from overwriting reset
 let finisherMode = false;
 let finisherIceShardCount = 0; // Track ice shards cast during finisher (need 2)
 let finisherTimeout = null;
+let finisherMessageShown = false; // Track if finisher message has been shown
 const FINISHER_TIME_LIMIT = 10000; // 10 seconds to perform finisher
 
 // Sound effects system
@@ -750,6 +751,7 @@ function checkGameEnd() {
         console.log('Player defeated! Boss wins!');
         gameRunning = false;
         finisherMode = false; // Cancel finisher if player dies
+        finisherMessageShown = false; // Reset flag
         if (finisherTimeout) {
             clearTimeout(finisherTimeout);
             finisherTimeout = null;
@@ -758,12 +760,19 @@ function checkGameEnd() {
         setTimeout(() => {
             showGameOverScreen(false); // false = defeat
         }, 100);
-    } else if (bossHealth <= 0 && gameRunning && !finisherMode) {
+    } else if (bossHealth <= 0 && gameRunning && !finisherMode && !finisherMessageShown) {
+        // Double-check that message overlay doesn't already exist (prevent race conditions)
+        const existingOverlay = document.getElementById('finisher-message-overlay');
+        if (existingOverlay) {
+            return; // Already showing, don't trigger again
+        }
+        
         console.log('Boss defeated! FINISHER MODE ACTIVATED!');
         finisherMode = true;
         finisherIceShardCount = 0;
         
         // Pause everything and show dramatic message
+        // Note: finisherMessageShown is set inside showFinisherMessage() to prevent race conditions
         showFinisherMessage();
         
         // Set timeout - if player doesn't perform finisher in time, auto-finish
@@ -1459,6 +1468,12 @@ function replayGame() {
     const overlay = document.getElementById('game-over-overlay');
     if (overlay) overlay.remove();
     
+    // Remove finisher message overlay if it exists
+    const finisherMessage = document.getElementById('finisher-message-overlay');
+    if (finisherMessage) {
+        finisherMessage.remove();
+    }
+    
     // Reset game state
     gameStartTime = Date.now();
     hintShown = false; // Reset hint flag
@@ -1467,6 +1482,7 @@ function replayGame() {
     highestCombo = 0;
     comboJustReset = true; // Flag to prevent backend from overwriting
     finisherMode = false; // Reset finisher mode
+    finisherMessageShown = false; // Reset finisher message flag
     finisherIceShardCount = 0;
     if (finisherTimeout) {
         clearTimeout(finisherTimeout);
@@ -1927,6 +1943,14 @@ function playDemonWalkAttack(damage = 0) {
 
 // Show dramatic finisher message overlay
 function showFinisherMessage() {
+    // Prevent multiple calls - check if message already exists or flag is set
+    if (finisherMessageShown) {
+        const existingMessage = document.getElementById('finisher-message-overlay');
+        if (existingMessage) {
+            return; // Already shown, don't show again
+        }
+    }
+    
     // Stop boss movement animation
     const bossBox = document.querySelector('.boss-box');
     if (bossBox) {
@@ -1934,11 +1958,14 @@ function showFinisherMessage() {
         bossBox.style.transform = ''; // Reset transform
     }
     
-    // Remove any existing finisher message
+    // Remove any existing finisher message (safety check)
     const existingMessage = document.getElementById('finisher-message-overlay');
     if (existingMessage) {
         existingMessage.remove();
     }
+    
+    // Set flag immediately to prevent race conditions
+    finisherMessageShown = true;
     
     // Create overlay
     const overlay = document.createElement('div');
@@ -2091,6 +2118,7 @@ function performFinisherAnimation() {
     }
     console.log('EPIC FINISHER ANIMATION!');
     finisherMode = false; // Exit finisher mode
+    finisherMessageShown = false; // Reset flag after finisher completes
     
     // Stop all boss animations
     if (demonIdleInterval) {
