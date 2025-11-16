@@ -4,17 +4,17 @@
 
 A real-time boss battle game controlled entirely through hand gestures using MediaPipe computer vision. Cast spells, execute combos, and defeat the demon boss using only your hands!
 
-## Features
+## 🎯 Features
 
-- 🎮 **Real-time hand gesture recognition** - Using MediaPipe Hands for accurate gesture detection
-- 🧙 **3 unique spells** - Fireball, Ice Shard, and Lightning
-- 💥 **Combo system** - Chain gestures together for devastating combo attacks
-- 👹 **Animated boss** - Multiple animation states (idle, hit, cleave, death)
-- 💫 **Mana system** - Strategic resource management with mana costs and regeneration
-- ⚡ **Dynamic events** - Boss becomes weak to certain elements, creating tactical opportunities
-- 🎯 **Visual feedback** - Real-time gesture detection feedback and damage numbers
-- 🎵 **Sound effects & music** - Immersive audio for spells and background music
-- 🏆 **Victory/Defeat screens** - Complete game experience with stats and replay
+-  **Real-time hand gesture recognition** - Using MediaPipe Hands for accurate gesture detection
+-  **3 unique spells** - Fireball, Ice Shard, and Lightning
+-  **Combo system** - Chain gestures together for devastating combo attacks
+-  **Animated boss** - Multiple animation states (idle, hit, cleave, death)
+-  **Mana system** - Strategic resource management with mana costs and regeneration
+-  **Dynamic events** - Boss becomes weak to certain elements, creating tactical opportunities
+-  **Visual feedback** - Real-time gesture detection feedback and damage numbers
+-  **Sound effects & music** - Immersive audio for spells and background music
+-  **Victory/Defeat screens** - Complete game experience with stats and replay
 
 ## 🚀 Quick Start
 
