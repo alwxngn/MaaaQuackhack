@@ -90,7 +90,7 @@ class _GestureRecognizer: # Changed to _ to show it's "private"
 # --- THIS IS THE NEW "LIBRARY" API FOR THE SERVER ---
 
 # 1. We initialize the camera and recognizer ONCE when the file is imported
-_cap = cv2.VideoCapture(1) # Using camera 0
+_cap = cv2.VideoCapture(0) # Using camera 0
 _recognizer = _GestureRecognizer()
 
 def get_gesture():
@@ -124,7 +124,7 @@ if __name__ == '__main__':
     # We have to create a *separate* recognizer and cap for this test
     # so it doesn't interfere with the server's one.
     test_recognizer = _GestureRecognizer()
-    test_cap = cv2.VideoCapture(1) 
+    test_cap = cv2.VideoCapture(0) 
 
     while True:
         ret, frame = test_cap.read()

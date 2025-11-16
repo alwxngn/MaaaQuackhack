@@ -89,6 +89,19 @@ body{
     height: 100px;
 }
 
+.ice-shard-sprite {
+    image-rendering: pixelated; /* Keep pixel art crisp */
+    pointer-events: none;
+    width: 120px;
+    height: 120px;
+}
+
+.lightning-sprite {
+    image-rendering: pixelated;
+    pointer-events: none;
+    filter: brightness(1.5);
+}
+
 #demon-sprite {
     width: 2200px;
     height: 1200px;

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import random
 import time
@@ -7,7 +7,7 @@ import time
 # You can import their function directly.
 #
 # ---  ---
-import archmage_cv 
+# REMOVED: import archmage_cv - using browser-based detection instead
 
 # --- 1. SORCERER'S LEARNING AREA ---
 app = Flask(__name__)
@@ -18,20 +18,33 @@ CORS(app) # Allow cross-origin requests
 last_gesture = "NONE"
 last_gesture_time = 0
 combo_counter = 0
+browser_gesture = "NONE"  # Gesture received from browser
 
-ATTACK_COOLDOWN = 1  # seconds
+ATTACK_COOLDOWN = 0  # seconds (cooldown disabled)
 last_attack_time = 0
 
+
+@app.route('/set_gesture', methods=['POST'])
+def set_gesture():
+    """Receive gesture data from browser"""
+    global browser_gesture
+    data = request.json
+    browser_gesture = data.get('gesture', 'NONE')
+    return jsonify({'status': 'ok'})
 
 @app.route('/get_command')
 def get_command():
     """
     This is the "API" that the JavaScript game calls 60 times a second.
     """
+    global browser_gesture
     
-    # 1. Get the raw gesture from the Archmage's script
-    # This will now call the new, fixed archmage_cv.py function
-    current_gesture = archmage_cv.get_gesture()
+    # 1. Get the gesture from browser MediaPipe detection
+    current_gesture = browser_gesture
+    
+    # DEBUG: Log what gesture we got
+    if current_gesture != "NONE":
+        print(f"🖐️  DETECTED: {current_gesture}")
 
     # --- 3. Still SPELL LOGIC GOES HERE ---
     
@@ -62,16 +75,13 @@ def get_command():
             # --- 3. SPELL LOGIC ---
             # Both checks passed! We can now cast a spell.
 
-            if current_gesture == "FIST" and last_gesture == "OPEN_PALM":
-                command = "EXPLOSION_COMBO"
-                combo_counter += 2
-
-            elif current_gesture == "BANDO" and last_gesture == "POINT":
-                command = "HEALING_LIGHT_COMBO"
-                combo_counter += 2
+            # COMBO DISABLED
+            # if current_gesture == "FIST" and last_gesture == "OPEN_PALM":
+            #     command = "EXPLOSION_COMBO"
+            #     combo_counter += 2
                 
-                # Single spells
-            elif current_gesture == "FIST":
+            # Single spells
+            if current_gesture == "FIST":
                 command = "FIREBALL"
                 combo_counter += 1
 
@@ -82,16 +92,10 @@ def get_command():
             elif current_gesture == "POINT": 
                 command = "LIGHTNING"
                 combo_counter += 1
-                    
-            elif current_gesture == "BANDO": 
-                command = "HEAL" 
-                
-            elif current_gesture == "PUNCH": # We need to add PUNCH!
-                command = "PUNCH_COMBO"
-                combo_counter += 3
 
             if command != "NONE":
                 last_attack_time = current_time
+                print(f"⚡ COMMAND SENT: {command}")
 
         else:
             print("Spell on cooldown...")
