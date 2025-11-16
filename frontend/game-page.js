@@ -5,6 +5,7 @@ let bossHealth = 200;
 const MAX_BOSS_HEALTH = 200;
 let gameRunning = false;
 let comboCount = 0;
+let highestCombo = 0; // Track highest combo achieved
 
 // Sound effects system
 const sounds = {
@@ -274,17 +275,42 @@ function updateCooldownDisplay(cooldown) {
         cooldownDisplay.textContent = `Cooldown: ${cooldown ? `${cooldown.toFixed(1)}s` : 'Ready'}`;
     }
 }
+
+// Function to update combo display
+function updateComboDisplay() {
+    const comboDisplay = document.getElementById('combo-display');
+    if (comboDisplay) {
+        if (comboCount > 0) {
+            comboDisplay.textContent = `COMBO: ${comboCount}x`;
+            comboDisplay.style.opacity = '1';
+        } else {
+            comboDisplay.style.opacity = '0';
+        }
+    }
+    
+    // Update highest combo
+    if (comboCount > highestCombo) {
+        highestCombo = comboCount;
+    }
+}
 // --- ⭐️ END OF REPLACED FUNCTION ⭐️ ---
 
 
 // Function to update player health
 function updatePlayerHealth(newHealth) {
+    const oldHealth = playerHealth;
     playerHealth = Math.max(0, Math.min(MAX_PLAYER_HEALTH, newHealth));
     const playerHealthBar = document.getElementById('player-hp-fill');
     
     if (playerHealthBar) {
         const healthPercentage = (playerHealth / MAX_PLAYER_HEALTH) * 100;
         playerHealthBar.style.width = healthPercentage + '%';
+    }
+    
+    // Reset combo if player took damage
+    if (newHealth < oldHealth && comboCount > 0) {
+        comboCount = 0;
+        updateComboDisplay();
     }
     
     console.log('Player health:', playerHealth + '/' + MAX_PLAYER_HEALTH);
@@ -620,7 +646,7 @@ function showGameOverScreen(isVictory) {
     `;
     const gameTime = typeof gameStartTime !== 'undefined' ? Math.floor((Date.now() - gameStartTime) / 1000) : 0;
     stats.innerHTML = `
-        <div style="margin-bottom: 15px;">Combos: ${comboCount}</div>
+        <div style="margin-bottom: 15px;">Highest Combo: ${highestCombo}x</div>
         <div style="margin-bottom: 15px;">Time: ${gameTime}s</div>
         <div>Final Boss HP: ${Math.max(0, bossHealth)}/${MAX_BOSS_HEALTH}</div>
     `;
@@ -685,9 +711,59 @@ function showGameOverScreen(isVictory) {
         replayGame();
     };
     
+    // Create Return Home button
+    const homeButton = document.createElement('a');
+    homeButton.href = 'start-page.html';
+    homeButton.textContent = 'RETURN HOME';
+    homeButton.style.cssText = `
+        padding: 20px 50px;
+        font-size: 26px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
+        color: white;
+        border: 3px solid #666;
+        border-radius: 15px;
+        cursor: pointer;
+        box-shadow: 
+            0 8px 16px rgba(0,0,0,0.4),
+            inset 0 0 20px rgba(255,255,255,0.1);
+        transition: all 0.3s;
+        animation: slideUp 0.5s ease-out 0.7s both;
+        font-family: 'Bungee', cursive;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        position: relative;
+        z-index: 10;
+        text-decoration: none;
+        display: inline-block;
+    `;
+    homeButton.onmouseover = function() {
+        this.style.background = 'linear-gradient(135deg, #5a5a5a, #3a3a3a)';
+        this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.5), inset 0 0 30px rgba(255,255,255,0.2)';
+        this.style.transform = 'scale(1.08) translateY(-2px)';
+    };
+    homeButton.onmouseout = function() {
+        this.style.background = 'linear-gradient(135deg, #4a4a4a, #2a2a2a)';
+        this.style.boxShadow = '0 8px 16px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.1)';
+        this.style.transform = 'scale(1) translateY(0)';
+    };
+    
+    // Create button container to arrange buttons side by side
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = `
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        width: 100%;
+        animation: slideUp 0.5s ease-out 0.5s both;
+    `;
+    buttonContainer.appendChild(replayButton);
+    buttonContainer.appendChild(homeButton);
+    
     overlay.appendChild(title);
     overlay.appendChild(stats);
-    overlay.appendChild(replayButton);
+    overlay.appendChild(buttonContainer);
     document.body.appendChild(overlay);
 }
 
@@ -845,8 +921,10 @@ function replayGame() {
     gameStartTime = Date.now();
     resetHealth();
     comboCount = 0;
+    highestCombo = 0;
     lastDetectedGesture = 'NONE';
     gameRunning = true;
+    updateComboDisplay();
     
     // Restart background music
     if (sounds.backgroundMusic) {
@@ -1268,6 +1346,9 @@ async function gameLoop(){
         event = data.event || "NONE";
         cooldown = data.cooldown || 0;
         comboCount = data.combo;
+        
+        // Update combo display
+        updateComboDisplay();
         
         // Update mana from backend
         if (data.mana !== undefined && data.max_mana !== undefined) {
