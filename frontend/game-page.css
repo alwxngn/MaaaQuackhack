@@ -5,7 +5,7 @@
 }
 
 body {
-    font-family: "Unbounded", sans-serif;
+    font-family: "Press Start 2P", cursive;
     margin: 60px;
     margin-top: 50px;
     overflow: hidden;
@@ -315,7 +315,7 @@ body::after {
     top: 30px;
     left: 50%;
     transform: translateX(-50%);
-    font-family: "Unbounded", sans-serif;
+    font-family: "Press Start 2P", cursive;
     font-size: 32px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -353,7 +353,7 @@ body::after {
     top: 150px;
     left: 50%;
     transform: translateX(-50%);
-    font-family: 'Orbitron', sans-serif;
+    font-family: "Press Start 2P", cursive;
     font-size: 42px;
     font-weight: 800;
     letter-spacing: 3px;

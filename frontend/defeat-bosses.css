@@ -5,7 +5,7 @@
 }
 
 body {
-    font-family: "Unbounded", sans-serif;
+    font-family: "Press Start 2P", cursive;
     min-height: 100vh;
     background: radial-gradient(circle at center, rgba(139, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%);
     background-size: cover;
@@ -133,7 +133,7 @@ body::after {
 }
 
 .bosses-title {
-    font-family: "Bungee", sans-serif;
+    font-family: "Press Start 2P", cursive;
     font-size: 3.5rem;
     color: #ff6b00;
     text-shadow: 0 0 30px #ff6b00, 2px 2px 6px rgba(0, 0, 0, 0.8);
@@ -144,7 +144,7 @@ body::after {
 }
 
 .bosses-subtitle {
-    font-family: "Orbitron", sans-serif;
+    font-family: "Press Start 2P", cursive;
     font-size: 1.3rem;
     color: #ffb700;
     text-shadow: 0 0 15px rgba(255, 183, 0, 0.6);
@@ -174,10 +174,11 @@ body::after {
     align-items: center;
     justify-content: center;
     gap: 12px;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
     box-shadow: 0 0 20px rgba(255, 149, 0, 0.5), inset 0 0 10px rgba(255, 149, 0, 0.1);
     overflow: hidden;
     position: relative;
+    cursor: pointer;
 }
 
 .boss-card::before {
@@ -189,10 +190,46 @@ body::after {
     bottom: 0;
     background: linear-gradient(135deg, rgba(255, 107, 0, 0) 0%, rgba(255, 107, 0, 0.1) 100%);
     pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.boss-card:hover::before {
+    opacity: 0.8;
+}
+
+.boss-card.selected {
+    border-color: #00ff00;
+    box-shadow: 
+        0 0 40px rgba(0, 255, 0, 0.8), 
+        inset 0 0 20px rgba(0, 255, 0, 0.2),
+        0 0 60px rgba(0, 255, 0, 0.4);
+    transform: translateY(-5px) scale(1.02);
+    animation: selectPulse 0.5s ease-out;
+}
+
+.boss-card.selected::before {
+    background: linear-gradient(135deg, rgba(0, 255, 0, 0) 0%, rgba(0, 255, 0, 0.15) 100%);
+    opacity: 1;
+}
+
+.boss-card.selected:hover {
+    transform: translateY(-8px) scale(1.03);
+}
+
+@keyframes selectPulse {
+    0% {
+        transform: translateY(-5px) scale(1.02);
+    }
+    50% {
+        transform: translateY(-5px) scale(1.07);
+    }
+    100% {
+        transform: translateY(-5px) scale(1.02);
+    }
 }
 
 .boss-description {
-    font-family: "Unbounded", sans-serif;
+    font-family: "Press Start 2P", cursive;
     font-size: 0.9rem;
     color: #ff9500;
     font-style: italic;

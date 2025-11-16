@@ -477,7 +477,7 @@ function showPhaseTransitionMessage(text, color) {
     message.style.textShadow = `0 0 30px ${color}, 0 0 60px ${color}, 2px 2px 4px rgba(0,0,0,0.9)`;
     message.style.zIndex = '2000';
     message.style.pointerEvents = 'none';
-    message.style.fontFamily = 'Bungee, cursive';
+    message.style.fontFamily = '"Press Start 2P", cursive';
     message.style.letterSpacing = '8px';
     message.style.textTransform = 'uppercase';
     message.style.opacity = '0';
@@ -872,7 +872,7 @@ function showGameOverScreen(isVictory) {
         letter-spacing: 6px;
         text-transform: uppercase;
         animation: ${isVictory ? 'burn 3s ease-in-out infinite, slideUp 0.8s ease-out' : 'defeatPulse 3s ease-in-out infinite, slideUp 0.8s ease-out'};
-        font-family: 'Orbitron', sans-serif;
+        font-family: "Press Start 2P", cursive;
         position: relative;
         z-index: 10;
         text-shadow: ${isVictory ? `
@@ -894,7 +894,7 @@ function showGameOverScreen(isVictory) {
         margin-bottom: 40px;
         text-align: center;
         animation: slideUp 0.5s ease-out 0.3s both;
-        font-family: 'Orbitron', sans-serif;
+        font-family: "Press Start 2P", cursive;
         font-weight: 600;
         position: relative;
         z-index: 10;
@@ -921,7 +921,7 @@ function showGameOverScreen(isVictory) {
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         transition: all 0.3s;
         animation: slideUp 0.5s ease-out 0.5s both;
-        font-family: 'Orbitron', sans-serif;
+        font-family: "Press Start 2P", cursive;
         letter-spacing: 1px;
         text-transform: uppercase;
         position: relative;
@@ -966,7 +966,7 @@ function showGameOverScreen(isVictory) {
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         transition: all 0.3s;
         animation: slideUp 0.5s ease-out 0.7s both;
-        font-family: 'Orbitron', sans-serif;
+        font-family: "Press Start 2P", cursive;
         letter-spacing: 1px;
         text-transform: uppercase;
         position: relative;
@@ -1320,7 +1320,7 @@ function showManaGainFeedback(amount, x, y) {
     manaText.style.zIndex = '1002';
     manaText.style.pointerEvents = 'none';
     manaText.style.userSelect = 'none';
-    manaText.style.fontFamily = '"Orbitron", sans-serif';
+    manaText.style.fontFamily = '"Press Start 2P", cursive';
     
     boxContainer.appendChild(manaText);
     
@@ -1362,7 +1362,7 @@ function showHealFeedback(amount, x, y) {
     healText.style.zIndex = '1002';
     healText.style.pointerEvents = 'none';
     healText.style.userSelect = 'none';
-    healText.style.fontFamily = '"Orbitron", sans-serif';
+    healText.style.fontFamily = '"Press Start 2P", cursive';
     
     boxContainer.appendChild(healText);
     

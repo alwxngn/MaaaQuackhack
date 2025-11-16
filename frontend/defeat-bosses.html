@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Bungee&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="defeat-bosses.css">
     <title>ComboCraft - Defeat Bosses</title>
 </head>
@@ -38,10 +37,39 @@
     </div>
 
     <script>
-        function selectBoss(bossName) {
-            // Navigate to game page or handle boss selection
-            window.location.href = 'game-page.html?boss=' + bossName;
-        }
+        // Make boss cards selectable - just visual selection, no navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const bossCards = document.querySelectorAll('.boss-card');
+            
+            bossCards.forEach(card => {
+                card.style.cursor = 'pointer';
+                
+                card.addEventListener('click', function() {
+                    // Remove selected state from all cards
+                    bossCards.forEach(c => {
+                        c.classList.remove('selected');
+                    });
+                    
+                    // Add selected state to clicked card
+                    this.classList.add('selected');
+                });
+                
+                // Hover effects
+                card.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('selected')) {
+                        this.style.transform = 'translateY(-10px) scale(1.05)';
+                        this.style.boxShadow = '0 0 40px rgba(255, 149, 0, 0.8), inset 0 0 20px rgba(255, 149, 0, 0.2)';
+                    }
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('selected')) {
+                        this.style.transform = 'translateY(0) scale(1)';
+                        this.style.boxShadow = '0 0 20px rgba(255, 149, 0, 0.5), inset 0 0 10px rgba(255, 149, 0, 0.1)';
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>
