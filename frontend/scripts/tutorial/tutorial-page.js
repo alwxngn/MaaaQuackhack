@@ -41,18 +41,32 @@ function detectGesture(landmarks) {
     
     const extendedCount = [thumb, index, middle, ring, pinky].filter(Boolean).length;
     
-    // Check for thumbs up first (thumb extended, others curled)
-    // Thumb extended but other fingers not extended = thumbs up
-    if (thumb && !index && !middle && !ring && !pinky) {
-        return 'THUMBS_UP';
+    // Check for thumbs up first - requires a "good" thumbs up
+    // Thumbs up: thumb pointing UP (tip above MCP) AND all other fingers curled
+    if (!index && !middle && !ring && !pinky) {
+        // Check if thumb is pointing upward (more strict)
+        const thumbTip = landmarks[4];
+        const thumbMCP = landmarks[2]; // Thumb MCP is landmark 2
+        const thumbIP = landmarks[3]; // Thumb IP
+        
+        // Thumb is pointing UP if tip is significantly above MCP
+        const thumbPointingUp = thumbTip.y < thumbMCP.y - 0.05; // More strict threshold
+        
+        // Thumb should also be extended outward (away from hand)
+        const thumbExtendedOut = Math.abs(thumbTip.x - thumbIP.x) > 0.03;
+        
+        // Require both upward and outward extension for a good thumbs up
+        if (thumbPointingUp && thumbExtendedOut) {
+            return 'THUMBS_UP';
+        }
     }
     
     // FIST: No fingers extended (including thumb)
     if (extendedCount === 0) {
         return 'FIST';
     }
-    // POINT: Only index finger extended
-    if (index && !middle && !ring && !pinky && !thumb) {
+    // POINT: Only index finger extended (thumb check removed - works better without it)
+    if (index && !middle && !ring && !pinky) {
         return 'POINT';
     }
     // OPEN_PALM: All fingers extended (4 or more, thumb optional)

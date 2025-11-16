@@ -60,11 +60,16 @@ let lastPhaseCheck = 0;
 // Game start time tracking
 let gameStartTime = Date.now();
 
+// Hint system - show hint after 5 seconds
+let hintShown = false;
+const HINT_DELAY = 5000; // 5 seconds in milliseconds
+
 // Wait for page to load
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Game loaded!");
     resetHealth();
     gameStartTime = Date.now();
+    hintShown = false; // Reset hint flag
     startWebcam(); // <-- Start the webcam
     startDemonIdleAnimation(); // <-- Start demon idle animation
     gameRunning = true; // <-- START THE GAME!
@@ -102,17 +107,37 @@ function detectGesture(landmarks) {
     
     const extendedCount = [thumb, index, middle, ring, pinky].filter(Boolean).length;
     
-    // FIST: No fingers extended
+    // Check for thumbs up first - requires a "good" thumbs up
+    // Thumbs up: thumb pointing UP (tip above MCP) AND all other fingers curled
+    if (!index && !middle && !ring && !pinky) {
+        // Check if thumb is pointing upward (more strict)
+        const thumbTip = landmarks[4];
+        const thumbMCP = landmarks[2]; // Thumb MCP is landmark 2
+        const thumbIP = landmarks[3]; // Thumb IP
+        
+        // Thumb is pointing UP if tip is significantly above MCP
+        const thumbPointingUp = thumbTip.y < thumbMCP.y - 0.05; // More strict threshold
+        
+        // Thumb should also be extended outward (away from hand)
+        const thumbExtendedOut = Math.abs(thumbTip.x - thumbIP.x) > 0.03;
+        
+        // Require both upward and outward extension for a good thumbs up
+        if (thumbPointingUp && thumbExtendedOut) {
+            return 'THUMBS_UP';
+        }
+    }
+    
+    // FIST: No fingers extended (including thumb)
     if (extendedCount === 0) {
         return 'FIST';
     }
     
-    // POINT: Only index finger extended
+    // POINT: Only index finger extended (thumb check removed - works better without it)
     if (index && !middle && !ring && !pinky) {
         return 'POINT';
     }
     
-    // OPEN_PALM: All fingers extended (4 or more)
+    // OPEN_PALM: All fingers extended (4 or more, thumb optional)
     if (extendedCount >= 4) {
         return 'OPEN_PALM';
     }
@@ -176,8 +201,8 @@ function startWebcam() {
 
     hands.setOptions({
         maxNumHands: 2,
-        modelComplexity: 0, // Reduced from 1 to 0 for better performance
-        minDetectionConfidence: 0.5, // Reduced from 0.7 for faster detection
+        modelComplexity: 1, // Changed back to 1 to match tutorial for consistent detection
+        minDetectionConfidence: 0.6, // Slightly higher than before for better accuracy
         minTrackingConfidence: 0.5
     });
 
@@ -1436,6 +1461,7 @@ function replayGame() {
     
     // Reset game state
     gameStartTime = Date.now();
+    hintShown = false; // Reset hint flag
     resetHealth();
     comboCount = 0;
     highestCombo = 0;
@@ -2353,6 +2379,168 @@ function playDemonDeathAnimation(callback) {
     }, 100); // Slower for dramatic death
 }
 
+// Function to show hint overlay after 5 seconds
+function showOrbHintOverlay() {
+    // Pause the game
+    gameRunning = false;
+    
+    // Remove any existing hint overlay
+    const existingOverlay = document.getElementById('hint-overlay');
+    if (existingOverlay) {
+        existingOverlay.remove();
+    }
+    
+    // Create hint overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'hint-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, rgba(20, 20, 40, 0.95) 0%, rgba(5, 5, 15, 0.98) 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9998;
+        animation: fadeIn 0.5s ease-in;
+        overflow: hidden;
+    `;
+    
+    // Add animations if they don't exist
+    if (!document.getElementById('hint-overlay-styles')) {
+        const style = document.createElement('style');
+        style.id = 'hint-overlay-styles';
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translateY(50px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Create title
+    const title = document.createElement('h1');
+    title.textContent = 'TIP';
+    title.style.cssText = `
+        color: #d4a060;
+        font-size: 64px;
+        font-weight: 800;
+        margin-bottom: 30px;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        animation: slideUp 0.8s ease-out;
+        font-family: "Press Start 2P", cursive;
+        position: relative;
+        z-index: 10;
+        text-shadow: 0 0 8px rgba(200, 100, 60, 0.6), 0 0 15px rgba(180, 80, 50, 0.4), 1px 1px 3px rgba(0,0,0,0.8);
+    `;
+    
+    // Create hint message
+    const message = document.createElement('div');
+    message.innerHTML = `
+        <div style="margin-bottom: 20px; font-size: 24px; color: #e8e8e8;">Aim for <span style="color: #00FF88; font-weight: bold;">GREEN life orbs</span> and</div>
+        <div style="margin-bottom: 20px; font-size: 24px; color: #e8e8e8;"><span style="color: #4A9EFF; font-weight: bold;">BLUE mana orbs</span> with</div>
+        <div style="margin-bottom: 30px; font-size: 24px; color: #e8e8e8;">your <span style="color: #64B5F6; font-weight: bold;">ICE SHARD</span> spell!</div>
+    `;
+    message.style.cssText = `
+        color: #e8e8e8;
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 40px;
+        animation: slideUp 0.5s ease-out 0.3s both;
+        font-family: "Press Start 2P", cursive;
+        font-weight: 400;
+        position: relative;
+        z-index: 10;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        line-height: 1.8;
+        max-width: 800px;
+        padding: 0 20px;
+    `;
+    
+    // Create "Got it" button
+    const gotItButton = document.createElement('button');
+    gotItButton.textContent = 'GOT IT';
+    gotItButton.style.cssText = `
+        padding: 18px 45px;
+        font-size: 22px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #4A9EFF, #64B5F6);
+        color: #ffffff;
+        border: 2px solid rgba(100, 181, 246, 0.6);
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        transition: all 0.3s;
+        animation: slideUp 0.5s ease-out 0.5s both;
+        font-family: "Press Start 2P", cursive;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        position: relative;
+        z-index: 10;
+    `;
+    gotItButton.onmouseover = function() {
+        this.style.background = 'linear-gradient(135deg, #64B5F6, #4A9EFF)';
+        this.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)';
+        this.style.transform = 'scale(1.05) translateY(-2px)';
+    };
+    gotItButton.onmouseout = function() {
+        this.style.background = 'linear-gradient(135deg, #4A9EFF, #64B5F6)';
+        this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+        this.style.transform = 'scale(1) translateY(0)';
+    };
+    // Store overlay reference globally so gesture detection can access it
+    window.hintOverlay = overlay;
+    window.hintGestureCheckInterval = null;
+    
+    // Check for thumbs up gesture to unpause (gesture detection continues even when paused)
+    window.hintGestureCheckInterval = setInterval(() => {
+        // Check the last detected gesture from gesture detection
+        if (lastSentGesture === 'THUMBS_UP') {
+            clearInterval(window.hintGestureCheckInterval);
+            window.hintGestureCheckInterval = null;
+            window.hintOverlay = null;
+            overlay.remove();
+            // Resume the game
+            gameRunning = true;
+            gameLoop(); // Resume the game loop
+        }
+    }, 100); // Check every 100ms
+    
+    // Add instruction text about thumbs up
+    const instructionText = document.createElement('div');
+    instructionText.textContent = '👆 Give a THUMBS UP to continue!';
+    instructionText.style.cssText = `
+        color: #64B5F6;
+        font-size: 18px;
+        margin-top: 20px;
+        animation: slideUp 0.5s ease-out 0.7s both;
+        font-family: "Press Start 2P", cursive;
+        font-weight: 400;
+        position: relative;
+        z-index: 10;
+        text-shadow: 0 0 8px rgba(100, 181, 246, 0.6), 1px 1px 2px rgba(0,0,0,0.8);
+    `;
+    
+    // Hide the button since we're using gesture detection
+    gotItButton.style.display = 'none';
+    
+    // Add elements to overlay
+    overlay.appendChild(title);
+    overlay.appendChild(message);
+    overlay.appendChild(gotItButton);
+    overlay.appendChild(instructionText);
+    document.body.appendChild(overlay);
+}
+
 // Function to show a temporary "Challenge Complete!" message
 function showChallengeSuccessMessage() {
     const boxContainer = document.querySelector('.box-container');
@@ -2396,6 +2584,14 @@ async function gameLoop(){
     // --- ⭐️ NEW variables for challenge ⭐️ ---
     let challengeProgress = 0;
     let challengeTarget = 0;
+    
+    // Check if we should show the hint after 5 seconds
+    const elapsedTime = Date.now();
+    if (!hintShown && elapsedTime - gameStartTime >= HINT_DELAY) {
+        hintShown = true;
+        showOrbHintOverlay();
+        return; // Pause the loop - it will resume after the hint is dismissed
+    }
 
     try {
         const response = await fetch('http://localhost:5001/get_command');
