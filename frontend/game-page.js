@@ -216,6 +216,12 @@ function startWebcam() {
             for (let i = 0; i < results.multiHandLandmarks.length; i++) {
                 const landmarks = results.multiHandLandmarks[i];
                 
+                // Detect gesture first to determine spell circle style
+                const gesture = detectGesture(landmarks);
+                
+                // Draw spell circles on hands based on gesture
+                drawSpellCircle(canvasCtx, landmarks, gesture, canvasElement.width, canvasElement.height);
+                
                 drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, 
                     {color: '#00FF00', lineWidth: 3});
                 drawLandmarks(canvasCtx, landmarks, 
@@ -228,8 +234,7 @@ function startWebcam() {
                     y: wrist.y * canvasElement.height
                 };
                 
-                // Detect and send gesture for EACH hand independently
-                const gesture = detectGesture(landmarks);
+                // Send gesture for EACH hand independently
                 sendGestureToBackend(gesture);
             }
         } else {
@@ -397,14 +402,14 @@ function onBossPhaseChange(phase) {
             startDemonIdleAnimation(); // Restart with faster speed
             break;
             
-        case 3: // Final Form - Dark, crazy colors, stays in place
+        case 3: // Final Form - Dark, crazy colors, moves back and forth (away from player)
             console.log('💀 BOSS PHASE 3: FINAL FORM!');
-            // Very dark with crazy color cycling - stays in same position
+            // Very dark with crazy color cycling
             demonSprite.style.filter = 'brightness(0.7) saturate(2.5) hue-rotate(0deg) contrast(1.5)';
             demonSprite.style.boxShadow = '0 0 50px rgba(75, 0, 130, 1), 0 0 100px rgba(139, 0, 139, 0.9), 0 0 150px rgba(25, 25, 112, 0.8), 0 0 200px rgba(139, 0, 0, 0.7)';
             
-            // Only pulsing animation, no movement
-            bossBox.style.animation = 'bossFinalFormPulse 2s ease-in-out infinite';
+            // Back and forth movement - moves backward (away) then returns to original
+            bossBox.style.animation = 'bossMoveBackAway 3s ease-in-out infinite, bossFinalFormPulse 2s ease-in-out infinite';
             
             // Add color cycling effect
             if (!document.getElementById('boss-final-form-color-cycle')) {
@@ -438,7 +443,7 @@ function onBossPhaseChange(phase) {
             showPhaseTransitionMessage('FINAL FORM', '#8B0000');
             startDemonIdleAnimation(); // Restart with faster speed
             
-            // Add pulsing animation only (no movement)
+            // Add pulsing and backward movement animations
             if (!document.getElementById('boss-final-form-style')) {
                 const style = document.createElement('style');
                 style.id = 'boss-final-form-style';
@@ -449,6 +454,14 @@ function onBossPhaseChange(phase) {
                         }
                         50% {
                             filter: brightness(0.9);
+                        }
+                    }
+                    @keyframes bossMoveBackAway {
+                        0%, 100% {
+                            transform: translateX(0) translateY(0);
+                        }
+                        50% {
+                            transform: translateX(800px) translateY(-15px);
                         }
                     }
                 `;
@@ -1226,6 +1239,202 @@ function showGestureFeedback(gesture) {
     setTimeout(() => {
         canvas.style.filter = 'brightness(1) saturate(1)';
     }, 100);
+}
+
+// Draw spell circles on hands based on gesture
+function drawSpellCircle(ctx, landmarks, gesture, canvasWidth, canvasHeight) {
+    if (gesture === 'NONE') return;
+    
+    // Get middle finger knuckle (landmark 9) for circle positioning
+    const middleFingerKnuckle = landmarks[9];
+    const centerX = middleFingerKnuckle.x * canvasWidth;
+    const centerY = middleFingerKnuckle.y * canvasHeight;
+    
+    // Gesture-specific circle styles
+    let circleConfig = {
+        outerColor: '#FF4500',
+        innerColor: '#FF6347',
+        runeColor: '#FFD700',
+        size: 80,
+        rotation: 0
+    };
+    
+    const time = Date.now() / 1000;
+    const rotationSpeed = 0.5;
+    
+    switch(gesture) {
+        case 'FIST':
+            // Fireball - Red/Orange circles with fire runes
+            circleConfig = {
+                outerColor: '#FF4500',
+                innerColor: '#FF6347',
+                runeColor: '#FFD700',
+                size: 180,
+                rotation: time * rotationSpeed
+            };
+            break;
+        case 'OPEN_PALM':
+            // Ice Shard - Blue/Cyan circles with ice runes
+            circleConfig = {
+                outerColor: '#4169E1',
+                innerColor: '#64B5F6',
+                runeColor: '#B0E0E6',
+                size: 200,
+                rotation: -time * rotationSpeed
+            };
+            break;
+        case 'POINT':
+            // Lightning - Purple/White circles with lightning runes
+            circleConfig = {
+                outerColor: '#9370DB',
+                innerColor: '#BA55D3',
+                runeColor: '#FFFFFF',
+                size: 170,
+                rotation: time * rotationSpeed * 1.5
+            };
+            break;
+        default:
+            return;
+    }
+    
+    ctx.save();
+    
+    // Draw outer glowing circle
+    const gradient1 = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, circleConfig.size);
+    gradient1.addColorStop(0, circleConfig.innerColor + '80');
+    gradient1.addColorStop(0.5, circleConfig.outerColor + '40');
+    gradient1.addColorStop(1, circleConfig.outerColor + '00');
+    
+    ctx.fillStyle = gradient1;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, circleConfig.size, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Draw main circle ring
+    ctx.strokeStyle = circleConfig.outerColor;
+    ctx.lineWidth = 6;
+    ctx.shadowBlur = 30;
+    ctx.shadowColor = circleConfig.outerColor;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, circleConfig.size * 0.6, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Draw inner circle
+    ctx.strokeStyle = circleConfig.innerColor;
+    ctx.lineWidth = 4;
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = circleConfig.innerColor;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, circleConfig.size * 0.4, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Draw rotating runes/symbols
+    ctx.translate(centerX, centerY);
+    ctx.rotate(circleConfig.rotation);
+    
+    ctx.strokeStyle = circleConfig.runeColor;
+    ctx.lineWidth = 4;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = circleConfig.runeColor;
+    
+    // Draw runic symbols (simplified - triangles and lines)
+    const runeCount = gesture === 'OPEN_PALM' ? 6 : 8;
+    const runeRadius = circleConfig.size * 0.5;
+    
+    for (let i = 0; i < runeCount; i++) {
+        const angle = (Math.PI * 2 * i) / runeCount;
+        const x = Math.cos(angle) * runeRadius;
+        const y = Math.sin(angle) * runeRadius;
+        
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle + Math.PI / 2);
+        
+        // Draw rune based on gesture
+        if (gesture === 'FIST') {
+            // Fire rune - triangle pointing outward
+            ctx.beginPath();
+            ctx.moveTo(0, -16);
+            ctx.lineTo(-12, 16);
+            ctx.lineTo(12, 16);
+            ctx.closePath();
+            ctx.stroke();
+        } else if (gesture === 'OPEN_PALM') {
+            // Ice rune - snowflake-like
+            ctx.beginPath();
+            ctx.moveTo(0, -20);
+            ctx.lineTo(0, 20);
+            ctx.moveTo(-16, -16);
+            ctx.lineTo(16, 16);
+            ctx.moveTo(-16, 16);
+            ctx.lineTo(16, -16);
+            ctx.stroke();
+        } else if (gesture === 'POINT') {
+            // Lightning rune - zigzag
+            ctx.beginPath();
+            ctx.moveTo(-12, -20);
+            ctx.lineTo(0, 0);
+            ctx.lineTo(-8, 0);
+            ctx.lineTo(12, 20);
+            ctx.stroke();
+        }
+        
+        ctx.restore();
+    }
+    
+    // Draw center symbol
+    ctx.strokeStyle = circleConfig.runeColor;
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    if (gesture === 'FIST') {
+        // Fire symbol - small circle with point
+        ctx.arc(0, 0, 16, 0, Math.PI * 2);
+        ctx.fillStyle = circleConfig.runeColor + '40';
+        ctx.fill();
+    } else if (gesture === 'OPEN_PALM') {
+        // Ice symbol - hexagon
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI * 2 * i) / 6;
+            const x = Math.cos(angle) * 16;
+            const y = Math.sin(angle) * 16;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+    } else if (gesture === 'POINT') {
+        // Lightning symbol - star
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+            const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
+            const radius = i % 2 === 0 ? 20 : 10;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+    }
+    
+    // Reset shadow
+    ctx.shadowBlur = 0;
+    ctx.restore();
+    
+    // Draw pulsing particles
+    const particleCount = 16;
+    for (let i = 0; i < particleCount; i++) {
+        const angle = (Math.PI * 2 * i) / particleCount + time * 2;
+        const dist = circleConfig.size * 0.7 + Math.sin(time * 3 + i) * 10;
+        const px = centerX + Math.cos(angle) * dist;
+        const py = centerY + Math.sin(angle) * dist;
+        
+        ctx.fillStyle = circleConfig.runeColor + '80';
+        ctx.beginPath();
+        ctx.arc(px, py, 5, 0, Math.PI * 2);
+        ctx.fill();
+    }
 }
 
 // Show mana gain feedback
