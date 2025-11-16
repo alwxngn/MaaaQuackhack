@@ -1,6 +1,6 @@
 # ComboCraft - Gesture-Controlled CV Battle Game
 
-[![Demo Video](https://img.youtube.com/vi/xNuD9hViZFQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=xNuD9hViZFQ)
+[demo link](https://www.youtube.com/watch?v=xNuD9hViZFQ)
 
 A real-time boss battle game controlled entirely through hand gestures using MediaPipe computer vision. Cast spells, execute combos, and defeat the demon boss using only your hands!
 
