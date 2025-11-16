@@ -26,8 +26,13 @@ def train_model():
     print("GESTURE MODEL TRAINING")
     print("="*60 + "\n")
     
+    # Get directory of this script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    backend_dir = os.path.dirname(script_dir)
+    data_dir = os.path.join(backend_dir, 'data')
+    
     # Load data
-    data_file = 'gesture_training_data.csv'
+    data_file = os.path.join(data_dir, 'gesture_training_data.csv')
     if not os.path.exists(data_file):
         print(f"❌ Error: {data_file} not found!")
         print("Please run collect_gesture_data.py first to collect training data.")
@@ -84,13 +89,13 @@ def train_model():
     print(confusion_matrix(y_test, y_pred))
     
     # Save model
-    model_file = 'gesture_model.pkl'
+    model_file = os.path.join(data_dir, 'gesture_model.pkl')
     print(f"\n💾 Saving model to {model_file}...")
     with open(model_file, 'wb') as f:
         pickle.dump(model, f)
     
     # Save gesture labels for reference
-    labels_file = 'gesture_labels.pkl'
+    labels_file = os.path.join(data_dir, 'gesture_labels.pkl')
     unique_labels = sorted(df['gesture'].unique())
     with open(labels_file, 'wb') as f:
         pickle.dump(unique_labels, f)

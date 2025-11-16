@@ -10,10 +10,10 @@ let comboJustReset = false; // Flag to prevent backend from overwriting reset
 
 // Sound effects system
 const sounds = {
-    fireball: new Audio('../assets/sounds/fireball.mp3'),
-    iceShard: new Audio('../assets/sounds/ice_shard.wav'),
-    thunder: new Audio('../assets/sounds/thunder.wav'),
-    backgroundMusic: new Audio('../assets/sounds/background_music.wav')
+    fireball: new Audio('../../../assets/sounds/fireball.mp3'),
+    iceShard: new Audio('../../../assets/sounds/ice_shard.wav'),
+    thunder: new Audio('../../../assets/sounds/thunder.wav'),
+    backgroundMusic: new Audio('../../../assets/sounds/background_music.wav')
 };
 
 // Initialize sounds with volume
@@ -1480,7 +1480,7 @@ function playFireballAnimation(damage = 10) { // Default damage is 10
     
     const fireball = document.createElement('img');
     fireball.className = 'fireball-sprite';
-    fireball.src = `../assets/fireball/${fireballFrames[0]}`;
+    fireball.src = `../../assets/fireball/${fireballFrames[0]}`;
     fireball.style.position = 'absolute';
     fireball.style.left = (offsetX + startX) + 'px';
     fireball.style.top = startY + 'px';
@@ -1502,7 +1502,7 @@ function playFireballAnimation(damage = 10) { // Default damage is 10
     const animationInterval = setInterval(() => {
         // ... (animation/movement logic) ...
         currentFrame = (currentFrame + 1) % fireballFrames.length;
-        fireball.src = `../assets/fireball/${fireballFrames[currentFrame]}`;
+        fireball.src = `../../assets/fireball/${fireballFrames[currentFrame]}`;
         currentX += speed;
         currentSize += growthRate;
         fireball.style.left = currentX + 'px';
@@ -1569,7 +1569,7 @@ function playIceShardAnimation() {
     // Create ice shard sprite element in the container
     const iceShard = document.createElement('img');
     iceShard.className = 'ice-shard-sprite';
-    iceShard.src = `../assets/ice shards/${iceShardFrames[0]}`;
+    iceShard.src = `../../assets/ice shards/${iceShardFrames[0]}`;
     iceShard.style.position = 'absolute';
     iceShard.style.left = startX + 'px';
     iceShard.style.top = startY + 'px';
@@ -1592,7 +1592,7 @@ function playIceShardAnimation() {
     const animationInterval = setInterval(() => {
         // Update frame
         currentFrame = (currentFrame + 1) % iceShardFrames.length;
-        iceShard.src = `../assets/ice shards/${iceShardFrames[currentFrame]}`;
+        iceShard.src = `../../assets/ice shards/${iceShardFrames[currentFrame]}`;
         
         // Move ice shard to the right and grow
         currentX += speed;
@@ -1641,7 +1641,7 @@ function playLightningAnimation() {
     // Create lightning sprite element above the boss
     const lightning = document.createElement('img');
     lightning.className = 'lightning-sprite';
-    lightning.src = `../assets/lighting/${lightningFrames[0]}`;
+    lightning.src = `../../assets/lighting/${lightningFrames[0]}`;
     lightning.style.position = 'absolute';
     lightning.style.left = '50%';
     lightning.style.top = '0';
@@ -1661,7 +1661,7 @@ function playLightningAnimation() {
     const animationInterval = setInterval(() => {
         // Update frame
         currentFrame = (currentFrame + 1) % lightningFrames.length;
-        lightning.src = `../assets/lighting/${lightningFrames[currentFrame]}`;
+        lightning.src = `../../assets/lighting/${lightningFrames[currentFrame]}`;
         
         // Flash effect
         if (currentFrame === 0) {
@@ -1694,7 +1694,7 @@ function startDemonIdleAnimation() {
     demonIdleInterval = setInterval(() => {
         if (demonAnimationState === 'idle') {
             currentFrame = (currentFrame + 1) % idleFrames.length;
-            demonSprite.src = `../assets/demon idle/${idleFrames[currentFrame]}`;
+            demonSprite.src = `../../assets/demon idle/${idleFrames[currentFrame]}`;
             
             // Phase 2+ idle animation is faster and more aggressive
             // Animation speed is handled by interval timing
@@ -1745,7 +1745,7 @@ function playDemonHitAnimation(damage = 0) {
     
     demonHitInterval = setInterval(() => {
         if (currentFrame < hitFrames.length) {
-            demonSprite.src = `../assets/demon_take_hit/${hitFrames[currentFrame]}`;
+            demonSprite.src = `../../assets/demon_take_hit/${hitFrames[currentFrame]}`;
             currentFrame++;
         } else {
             clearInterval(demonHitInterval);
@@ -1809,7 +1809,7 @@ function playDemonCleaveAnimation(damage = 0) {
     
     demonCleaveInterval = setInterval(() => {
         if (currentFrame < cleaveFrames.length) {
-            demonSprite.src = `../assets/demon_cleave/${cleaveFrames[currentFrame]}`;
+            demonSprite.src = `../../assets/demon_cleave/${cleaveFrames[currentFrame]}`;
             currentFrame++;
         } else {
             clearInterval(demonCleaveInterval);
@@ -1863,7 +1863,7 @@ function playDemonWalkAttack(damage = 0) {
     const walkInterval = setInterval(() => {
         if (currentFrame < totalFrames) {
             const frameIndex = currentFrame % walkFrames.length;
-            demonSprite.src = `../assets/demon walk/${walkFrames[frameIndex]}`;
+            demonSprite.src = `../../assets/demon walk/${walkFrames[frameIndex]}`;
             currentFrame++;
         } else {
             clearInterval(walkInterval);
@@ -1944,7 +1944,7 @@ function playDemonDeathAnimation(callback) {
     
     const deathInterval = setInterval(() => {
         if (currentFrame < deathFrames.length) {
-            demonSprite.src = `../assets/demon_death/${deathFrames[currentFrame]}`;
+            demonSprite.src = `../../assets/demon_death/${deathFrames[currentFrame]}`;
             
             // Start fading and shrinking near the end
             if (currentFrame > deathFrames.length * 0.7) {
