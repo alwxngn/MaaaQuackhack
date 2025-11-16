@@ -29,9 +29,20 @@
             </div>
             
                     <div class="features-dark">
-            <div class="feature-dark">
-                <div class="feature-icon">⚔️</div>
-                <p>EPIC BATTLES</p>
+            <div class="difficulty-section feature-dark">
+                <div class="difficulty-icon">⚔️</div>
+                <p class="difficulty-main-label">DIFFICULTY</p>
+                <div class="difficulty-options">
+                    <div class="difficulty-option" data-difficulty="easy">
+                        <p>EASY</p>
+                    </div>
+                    <div class="difficulty-option" data-difficulty="medium">
+                        <p>MEDIUM</p>
+                    </div>
+                    <div class="difficulty-option" data-difficulty="hard">
+                        <p>HARD</p>
+                    </div>
+                </div>
             </div>
             <a href="instructions.html" class="feature-dark" style="text-decoration: none;">
                 <div class="feature-icon">📖</div>
@@ -42,6 +53,42 @@
                 <p>DEFEAT BOSSES</p>
             </a>
         </div>
+        
+        <script>
+            // Make difficulty options selectable
+            document.addEventListener('DOMContentLoaded', function() {
+                const difficultyOptions = document.querySelectorAll('.difficulty-option');
+                
+                difficultyOptions.forEach(option => {
+                    option.style.cursor = 'pointer';
+                    
+                    option.addEventListener('click', function() {
+                        // Remove selected state from all options
+                        difficultyOptions.forEach(opt => {
+                            opt.classList.remove('selected');
+                        });
+                        
+                        // Add selected state to clicked option
+                        this.classList.add('selected');
+                    });
+                    
+                    // Hover effects
+                    option.addEventListener('mouseenter', function() {
+                        if (!this.classList.contains('selected')) {
+                            this.style.transform = 'translateY(-4px) scale(1.05)';
+                            this.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.3)';
+                        }
+                    });
+                    
+                    option.addEventListener('mouseleave', function() {
+                        if (!this.classList.contains('selected')) {
+                            this.style.transform = 'translateY(0) scale(1)';
+                            this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+                        }
+                    });
+                });
+            });
+        </script>
         </div>
     </div>
 </body>

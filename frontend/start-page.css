@@ -309,3 +309,119 @@ h1 {
     text-shadow: 0 0 10px rgba(255, 99, 71, 0.5);
     line-height: 1.6;
 }
+
+.difficulty-section {
+    position: relative;
+    overflow: visible;
+}
+
+.difficulty-icon {
+    font-size: 40px;
+    animation: fireFloat 4s ease-in-out infinite;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.difficulty-section:nth-child(1) .difficulty-icon {
+    animation-delay: 0s;
+}
+
+.difficulty-main-label {
+    font-family: "Press Start 2P", cursive;
+    color: #ff6347;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(255, 99, 71, 0.5);
+    line-height: 1.6;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.difficulty-section:hover .difficulty-icon,
+.difficulty-section:hover .difficulty-main-label {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+.difficulty-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    box-sizing: border-box;
+}
+
+.difficulty-section:hover .difficulty-options {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(-50%);
+}
+
+.difficulty-option {
+    padding: 8px 14px;
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(30, 20, 15, 0.6);
+    border: 2px solid rgba(140, 100, 80, 0.7);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    position: relative;
+    text-align: center;
+}
+
+.difficulty-option p {
+    font-family: "Press Start 2P", cursive;
+    color: #c4b090;
+    font-size: 7px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    margin: 0;
+    text-shadow: 0 0 4px rgba(180, 160, 120, 0.3), 1px 1px 2px rgba(0, 0, 0, 0.8);
+    line-height: 1.4;
+    transition: all 0.3s ease;
+}
+
+.difficulty-option:hover {
+    background: rgba(60, 45, 30, 0.7);
+    border-color: rgba(160, 120, 90, 0.9);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.difficulty-option:hover p {
+    color: #e4c0a0;
+    text-shadow: 0 0 8px rgba(228, 192, 160, 0.5), 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.difficulty-option.selected {
+    border-color: #00ff00;
+    box-shadow: 
+        0 0 25px rgba(0, 255, 0, 0.6), 
+        inset 0 0 12px rgba(0, 255, 0, 0.1),
+        0 4px 12px rgba(0, 0, 0, 0.3);
+    background: rgba(0, 30, 0, 0.4);
+    transform: translateY(-2px) scale(1.02);
+}
+
+.difficulty-option.selected p {
+    color: #00ff00;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.8), 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.difficulty-option.selected:hover {
+    transform: translateY(-3px) scale(1.03);
+}
