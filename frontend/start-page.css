@@ -1,23 +1,301 @@
-body{
-background-image: url('../assets/comboCraft-start.jpg');  
-background-size: cover;  
-text-align: center;
-background-repeat: no-repeat; 
-background-position: center;
-min-height: 100vh;
-margin: 0;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-h1{
-    color: white;
-    padding-top: 200px;
-    font-size: 100px;
+body {
+    font-family: "Unbounded", sans-serif;
+    overflow: hidden;
+    background: #1a0f0a;
+    min-height: 100vh;
+    position: relative;
 }
 
-button{
-    height: 100px;
-    width: 400px;
-    font-size: 40px;
+.cave-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
 }
 
-/* add game intro */
+.cave-texture {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(ellipse at 20% 50%, rgba(139, 69, 19, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(101, 50, 15, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 40% 20%, rgba(139, 69, 19, 0.25) 0%, transparent 40%);
+    background-size: 100% 100%;
+    opacity: 0.8;
+}
+
+.fire-particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(255, 100, 0, 0.15) 0%, transparent 25%),
+        radial-gradient(circle at 85% 15%, rgba(255, 50, 0, 0.12) 0%, transparent 30%),
+        radial-gradient(circle at 50% 85%, rgba(255, 69, 0, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 20% 80%, rgba(200, 50, 0, 0.08) 0%, transparent 35%);
+    animation: fireFlicker 3s ease-in-out infinite;
+}
+
+@keyframes fireFlicker {
+    0%, 100% {
+        opacity: 0.6;
+        filter: brightness(0.9);
+    }
+    50% {
+        opacity: 0.8;
+        filter: brightness(1.1);
+    }
+}
+
+.container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.content {
+    text-align: center;
+    animation: fadeInUp 1.2s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.title-wrapper {
+    margin-bottom: 60px;
+}
+
+h1 {
+    font-family: "Unbounded", sans-serif;
+    font-size: 120px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #ff4500;
+    text-shadow: 
+        0 0 20px rgba(255, 69, 0, 0.8),
+        0 0 40px rgba(255, 100, 0, 0.5),
+        3px 3px 0px #2a1810;
+    animation: fireGlow 2s ease-in-out infinite;
+    letter-spacing: 3px;
+}
+
+@keyframes fireGlow {
+    0%, 100% {
+        text-shadow: 
+            0 0 20px rgba(255, 69, 0, 0.8),
+            0 0 40px rgba(255, 100, 0, 0.5),
+            3px 3px 0px #2a1810;
+        color: #ff4500;
+    }
+    50% {
+        text-shadow: 
+            0 0 30px rgba(255, 69, 0, 1),
+            0 0 60px rgba(255, 140, 0, 0.7),
+            3px 3px 0px #2a1810;
+        color: #ff6347;
+    }
+}
+
+.title-burning {
+    position: relative;
+    display: inline-block;
+}
+
+.title-burning::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #ff4500, #ff6347, #ff4500, transparent);
+    animation: fireWave 1.5s ease-in-out infinite;
+}
+
+@keyframes fireWave {
+    0%, 100% {
+        transform: scaleX(1);
+    }
+    50% {
+        transform: scaleX(1.1);
+    }
+}
+
+.subtitle-dark {
+    font-size: 28px;
+    color: #ff6347;
+    font-weight: 700;
+    letter-spacing: 3px;
+    animation: fadeInUp 1.5s ease-out;
+    text-shadow: 0 0 15px rgba(255, 99, 71, 0.7);
+}
+
+.button-container {
+    margin: 50px 0 80px 0;
+}
+
+.play-button-dark {
+    position: relative;
+    display: inline-block;
+    text-decoration: none;
+    padding: 25px 80px;
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: #fff8dc;
+    background: linear-gradient(135deg, #cc3300, #ff4500);
+    border: 3px solid #ff4500;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: firebreath 2.5s ease-in-out infinite;
+    box-shadow: 
+        0 0 30px rgba(255, 69, 0, 0.6),
+        inset 0 0 20px rgba(255, 140, 0, 0.3),
+        0 5px 20px rgba(0, 0, 0, 0.8);
+    font-family: "Unbounded", sans-serif;
+    text-transform: uppercase;
+}
+
+.play-button-dark::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 140, 0, 0.4), transparent);
+    animation: fireAura 2s ease-in-out infinite;
+}
+
+@keyframes fireAura {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
+}
+
+@keyframes firebreath {
+    0%, 100% {
+        box-shadow: 
+            0 0 30px rgba(255, 69, 0, 0.6),
+            inset 0 0 20px rgba(255, 140, 0, 0.3),
+            0 5px 20px rgba(0, 0, 0, 0.8);
+    }
+    50% {
+        box-shadow: 
+            0 0 50px rgba(255, 69, 0, 0.9),
+            inset 0 0 30px rgba(255, 140, 0, 0.5),
+            0 10px 30px rgba(255, 69, 0, 0.4);
+    }
+}
+
+.play-button-dark:hover {
+    transform: translateY(-5px);
+    background: linear-gradient(135deg, #ff4500, #ff6347);
+    box-shadow: 
+        0 0 60px rgba(255, 69, 0, 0.9),
+        inset 0 0 30px rgba(255, 140, 0, 0.5),
+        0 15px 40px rgba(255, 69, 0, 0.5);
+    color: #ffe4b5;
+}
+
+.play-button-dark:active {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 0 40px rgba(255, 69, 0, 0.7),
+        inset 0 0 20px rgba(255, 140, 0, 0.4);
+}
+
+.button-text {
+    position: relative;
+    z-index: 2;
+}
+
+.features-dark {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 60px;
+    animation: fadeInUp 2s ease-out;
+}
+
+.feature-dark {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 25px 35px;
+    background: rgba(139, 69, 19, 0.3);
+    border: 2px solid rgba(255, 69, 0, 0.5);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+}
+
+.feature-dark:hover {
+    background: rgba(255, 69, 0, 0.15);
+    border-color: rgba(255, 69, 0, 0.9);
+    transform: translateY(-8px);
+    box-shadow: 
+        0 15px 35px rgba(255, 69, 0, 0.3),
+        0 0 20px rgba(255, 69, 0, 0.4);
+}
+
+.feature-icon {
+    font-size: 48px;
+    animation: fireFloat 3s ease-in-out infinite;
+}
+
+.feature-dark:nth-child(2) .feature-icon {
+    animation-delay: 0.3s;
+}
+
+.feature-dark:nth-child(3) .feature-icon {
+    animation-delay: 0.6s;
+}
+
+@keyframes fireFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+.feature-dark p {
+    color: #ff6347;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(255, 99, 71, 0.5);
+}
