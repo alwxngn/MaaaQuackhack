@@ -20,6 +20,17 @@ last_gesture_time = 0
 combo_counter = 0
 browser_gesture = "NONE"  # Gesture received from browser
 
+# Spell usage tracking
+spell_usage = {
+    "FIREBALL": 0,
+    "ICE_SHARD": 0,
+    "LIGHTNING": 0,
+    "EXPLOSION_COMBO": 0,
+    "HEALING_LIGHT_COMBO": 0,
+    "LIGHTNING_STRIKE_COMBO": 0,
+    "PUNCH_COMBO": 0
+}
+
 ATTACK_COOLDOWN = 0  # seconds (cooldown disabled)
 last_attack_time = 0
 
@@ -87,6 +98,61 @@ def set_tutorial_mode():
     global current_mana
     current_mana = 999  # 999 = unlimited mana flag
     return jsonify({'status': 'ok', 'mana': current_mana})
+
+@app.route('/reset_combo', methods=['POST'])
+def reset_combo():
+    """Reset combo counter"""
+    global combo_counter
+    combo_counter = 0
+    return jsonify({'status': 'ok', 'combo': combo_counter})
+
+@app.route('/get_spell_stats', methods=['GET'])
+def get_spell_stats():
+    """Get spell usage statistics and favorite spell"""
+    global spell_usage
+    
+    # Find the favorite spell (most used)
+    favorite_spell = None
+    max_usage = 0
+    for spell, count in spell_usage.items():
+        if count > max_usage:
+            max_usage = count
+            favorite_spell = spell
+    
+    # Format spell name for display
+    spell_display_names = {
+        "FIREBALL": "Fireball",
+        "ICE_SHARD": "Ice Shard",
+        "LIGHTNING": "Lightning",
+        "EXPLOSION_COMBO": "Explosion Combo",
+        "HEALING_LIGHT_COMBO": "Healing Light Combo",
+        "LIGHTNING_STRIKE_COMBO": "Lightning Strike Combo",
+        "PUNCH_COMBO": "Punch Combo"
+    }
+    
+    favorite_display = spell_display_names.get(favorite_spell, "None") if favorite_spell else "None"
+    
+    return jsonify({
+        'spell_usage': spell_usage,
+        'favorite_spell': favorite_spell,
+        'favorite_spell_display': favorite_display,
+        'favorite_spell_count': max_usage
+    })
+
+@app.route('/reset_spell_stats', methods=['POST'])
+def reset_spell_stats():
+    """Reset spell usage statistics"""
+    global spell_usage
+    spell_usage = {
+        "FIREBALL": 0,
+        "ICE_SHARD": 0,
+        "LIGHTNING": 0,
+        "EXPLOSION_COMBO": 0,
+        "HEALING_LIGHT_COMBO": 0,
+        "LIGHTNING_STRIKE_COMBO": 0,
+        "PUNCH_COMBO": 0
+    }
+    return jsonify({'status': 'ok', 'spell_usage': spell_usage})
 
 @app.route('/get_command')
 def get_command():
@@ -185,6 +251,9 @@ def get_command():
                 if is_tutorial_mode or current_mana >= mana_cost:
                     if not is_tutorial_mode:
                         current_mana -= mana_cost
+                    # Track spell usage
+                    if command in spell_usage:
+                        spell_usage[command] += 1
                     last_attack_time = current_time
                     print(f"⚡ COMMAND SENT: {command} (Mana: {current_mana}/{MAX_MANA})")
                 else:

@@ -6,6 +6,7 @@ const MAX_BOSS_HEALTH = 200;
 let gameRunning = false;
 let comboCount = 0;
 let highestCombo = 0; // Track highest combo achieved
+let comboJustReset = false; // Flag to prevent backend from overwriting reset
 
 // Sound effects system
 const sounds = {
@@ -325,6 +326,12 @@ function updatePlayerHealth(newHealth) {
     // Reset combo if player took damage
     if (newHealth < oldHealth && comboCount > 0) {
         comboCount = 0;
+        comboJustReset = true; // Flag to prevent backend from overwriting
+        // Reset combo in backend too
+        fetch('http://localhost:5001/reset_combo', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        }).catch(err => console.error('Error resetting combo:', err));
         updateComboDisplay();
     }
     
@@ -901,11 +908,30 @@ function showGameOverScreen(isVictory) {
         text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     `;
     const gameTime = typeof gameStartTime !== 'undefined' ? Math.floor((Date.now() - gameStartTime) / 1000) : 0;
-    stats.innerHTML = `
-        <div style="margin-bottom: 15px;">Highest Combo: ${highestCombo}x</div>
-        <div style="margin-bottom: 15px;">Time: ${gameTime}s</div>
-        <div>Final Boss HP: ${Math.max(0, bossHealth)}/${MAX_BOSS_HEALTH}</div>
-    `;
+    
+    // Fetch favorite spell from backend
+    fetch('http://localhost:5001/get_spell_stats')
+        .then(response => response.json())
+        .then(data => {
+            const favoriteSpell = data.favorite_spell_display || "None";
+            const favoriteCount = data.favorite_spell_count || 0;
+            stats.innerHTML = `
+                <div style="margin-bottom: 15px;">Highest Combo: ${highestCombo}x</div>
+                <div style="margin-bottom: 15px;">Time: ${gameTime}s</div>
+                <div style="margin-bottom: 15px;">Favorite Spell: ${favoriteSpell} (${favoriteCount}x)</div>
+                <div>Final Boss HP: ${Math.max(0, bossHealth)}/${MAX_BOSS_HEALTH}</div>
+            `;
+        })
+        .catch(err => {
+            console.error('Error fetching spell stats:', err);
+            // Fallback if fetch fails
+            stats.innerHTML = `
+                <div style="margin-bottom: 15px;">Highest Combo: ${highestCombo}x</div>
+                <div style="margin-bottom: 15px;">Time: ${gameTime}s</div>
+                <div style="margin-bottom: 15px;">Favorite Spell: N/A</div>
+                <div>Final Boss HP: ${Math.max(0, bossHealth)}/${MAX_BOSS_HEALTH}</div>
+            `;
+        });
     
     const replayButton = document.createElement('button');
     replayButton.textContent = 'PLAY AGAIN';
@@ -1397,8 +1423,21 @@ function replayGame() {
     resetHealth();
     comboCount = 0;
     highestCombo = 0;
+    comboJustReset = true; // Flag to prevent backend from overwriting
     lastDetectedGesture = 'NONE';
     gameRunning = true;
+    
+    // Reset combo and spell stats in backend
+    fetch('http://localhost:5001/reset_combo', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    }).catch(err => console.error('Error resetting combo:', err));
+    
+    fetch('http://localhost:5001/reset_spell_stats', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    }).catch(err => console.error('Error resetting spell stats:', err));
+    
     updateComboDisplay();
     
     // Restart background music
@@ -1983,7 +2022,14 @@ async function gameLoop(){
         command = data.command
         event = data.event || "NONE";
         cooldown = data.cooldown || 0;
-        comboCount = data.combo;
+        
+        // Only update combo from backend if we didn't just reset it
+        if (!comboJustReset) {
+            comboCount = data.combo;
+        } else {
+            // Clear the reset flag after one frame
+            comboJustReset = false;
+        }
         
         // Update combo display
         updateComboDisplay();

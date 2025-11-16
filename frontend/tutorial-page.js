@@ -339,7 +339,7 @@ function showCountdownScreen() {
         align-items: center;
         z-index: 20000;
         color: white;
-        font-family: 'Orbitron', sans-serif;
+        font-family: 'Press Start 2P', cursive;
     `;
     
     const countdownContent = document.createElement('div');
@@ -350,25 +350,27 @@ function showCountdownScreen() {
     const countdownNumber = document.createElement('div');
     countdownNumber.id = 'countdown-number';
     countdownNumber.style.cssText = `
-        font-size: 120px;
-        font-weight: 900;
+        font-size: 72px;
+        font-weight: 400;
         color: #FFD700;
         text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
-        font-family: 'Bungee', cursive;
+        font-family: 'Press Start 2P', cursive;
         margin-bottom: 30px;
         animation: pulse 0.5s ease-in-out;
+        line-height: 1.6;
     `;
     
     const tipText = document.createElement('div');
     tipText.id = 'countdown-tip';
     tipText.style.cssText = `
-        font-size: 28px;
+        font-size: 12px;
         color: #00FF00;
         margin-top: 40px;
-        font-weight: 700;
+        font-weight: 400;
+        font-family: 'Press Start 2P', cursive;
         text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
         max-width: 600px;
-        line-height: 1.4;
+        line-height: 1.8;
     `;
     tipText.textContent = '💡 TIP: Pick up mana and health orbs by connecting your spells to them!                This boss will have three stages';
     
@@ -392,7 +394,7 @@ function showCountdownScreen() {
             }, 10);
         } else if (count === 0) {
             countdownNumber.textContent = 'GO!';
-            countdownNumber.style.fontSize = '140px';
+            countdownNumber.style.fontSize = '84px';
             countdownNumber.style.color = '#00FF00';
             countdownNumber.style.textShadow = '0 0 40px rgba(0, 255, 0, 1)';
         } else {

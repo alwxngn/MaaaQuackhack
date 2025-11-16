@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="game-page.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Bungee&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
@@ -28,7 +27,7 @@
             align-items: center;
             z-index: 10000;
             color: white;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Press Start 2P', cursive;
         }
         
         .tutorial-content {
@@ -38,20 +37,23 @@
         }
         
         .tutorial-title {
-            font-size: 48px;
-            font-weight: 900;
+            font-size: 28px;
+            font-weight: 400;
             color: #FFD700;
             margin-bottom: 30px;
             text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-            font-family: 'Bungee', cursive;
+            font-family: 'Press Start 2P', cursive;
+            line-height: 1.6;
         }
         
         .tutorial-instruction {
-            font-size: 32px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: 400;
             color: #fff;
             margin-bottom: 20px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            font-family: 'Press Start 2P', cursive;
+            line-height: 1.8;
         }
         
         .tutorial-progress {
@@ -88,8 +90,10 @@
         }
         
         .progress-label {
-            font-size: 18px;
+            font-size: 10px;
             color: #ccc;
+            font-family: 'Press Start 2P', cursive;
+            line-height: 1.6;
         }
         
         .progress-item.completed .progress-label {
@@ -97,10 +101,11 @@
         }
         
         .tutorial-hint {
-            font-size: 24px;
+            font-size: 12px;
             color: #FFD700;
             margin-top: 30px;
-            font-style: italic;
+            font-family: 'Press Start 2P', cursive;
+            line-height: 1.8;
         }
         
         @keyframes pulse {
@@ -112,6 +117,13 @@
                 transform: scale(1.2);
                 opacity: 0.8;
             }
+        }
+        
+        /* Override game-page.css fonts for tutorial */
+        .hp-label, .mana-label {
+            font-family: 'Press Start 2P', cursive !important;
+            font-weight: 400 !important;
+            font-size: 10px !important;
         }
     </style>
 </head>
