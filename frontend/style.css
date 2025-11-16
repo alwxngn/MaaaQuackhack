@@ -56,3 +56,10 @@ h1 {
   /* Apply the animation name, duration (0.2 seconds), and timing function */
   animation: shake 0.2s ease-in-out; 
 }
+
+.info-display {
+    font-size: 18px;
+    color: white;
+    text-align: center;
+    margin: 10px 0;
+}

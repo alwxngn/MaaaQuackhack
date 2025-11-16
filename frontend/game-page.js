@@ -83,6 +83,23 @@ function startWebcam() {
         alert('Could not access webcam. Please allow camera permissions.');
     });
 }
+// ADDED THESE
+function updateEventDisplay(event) {
+    const eventDisplay = document.getElementById('event-display');
+    if (eventDisplay) {
+        eventDisplay.textContent = `Event: ${event}`;
+    }
+}
+
+// Function to update the cooldown display
+function updateCooldownDisplay(cooldown) {
+    const cooldownDisplay = document.getElementById('cooldown-display');
+    if (cooldownDisplay) {
+        cooldownDisplay.textContent = `Cooldown: ${cooldown ? `${cooldown.toFixed(1)}s` : 'Ready'}`;
+    }
+}
+
+// ADDED THESE
 
 // Function to update player health
 function updatePlayerHealth(newHealth) {
@@ -219,6 +236,8 @@ async function gameLoop(){
     let command = "NONE";
     let event = "NONE";
 
+    let cooldown = 0; // For future use
+
 
     try {
         // my 5001 port // getting all the commands from the flask
@@ -227,6 +246,8 @@ async function gameLoop(){
 
         command = data.command
         event = data.event || "NONE"; // (FOR the qte)
+
+        cooldown = data.cooldown || 0; // (FOR the cooldown display)
         
         // --- FIX 2.2: Moved this line INSIDE the 'try' block ---
         comboCount = data.combo; 
@@ -236,6 +257,10 @@ async function gameLoop(){
         requestAnimationFrame(gameLoop);
         return;
     }
+
+    // --- ADDED THIS ---
+    updateCooldownDisplay(cooldown);
+    updateEventDisplay(event);
 
     // --- This is the "Hand-off" ---
     // It calls Ally's functions based on your commands.
